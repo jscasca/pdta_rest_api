@@ -1,6 +1,7 @@
 package com.pd.api.entity;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -43,13 +44,14 @@ public class Credential implements Serializable {
     @OneToOne
     private User user;
     
+    public Credential(){}
     public Credential(User user, String password) { this(user,password, Role.member);}
     public Credential(User user, String password, Role role) {this(user, password, Sets.newHashSet(role));}
     public Credential(User user, String password, Set<Role> roles) {
         this.user = user;
         this.username = this.user.getUserName();
         this.password = password;
-        this.roles = roles;
+        this.roles = new HashSet<Role>(roles);
     }
     
     public String getUsername() {
@@ -60,8 +62,15 @@ public class Credential implements Serializable {
         return password;
     }
     
+    /**
+     * Returns a set of roles for the credential.
+     * The returned set is a defensive copy
+     * 
+     * @return a set with roles
+     */
     public Set<Role> getRoles() {
-        return roles;
+        //Defensive copy, nobody will be able to change the list from the outside
+        return new HashSet<Role>(roles);
     }
     
     public User getUser() {
@@ -73,7 +82,7 @@ public class Credential implements Serializable {
     }
     
     public void setRoles(Set<Role> roles) {
-        this.roles = roles;
+        this.roles = new HashSet<Role>(roles);
     }
     
     public void addRole(Role role) {
@@ -82,5 +91,10 @@ public class Credential implements Serializable {
     
     public void removeRoles(Role role) {
         this.roles.remove(role);
+    }
+    
+    @Override
+    public String toString() {
+        return username + ":" + id;
     }
 }

@@ -143,7 +143,7 @@ public class DAO {
         }
     }
     
-    /*public static Role getMemberRole() {
+    public static Role getMemberRole() {
         return getUniqueByName(Role.class, Role.MEMBER);
     }
     
@@ -151,7 +151,7 @@ public class DAO {
         return getUniqueByName(Role.class, Role.ADMIN);
     }
     
-    public static Role getGuestRole() {
+    /*public static Role getGuestRole() {
         return getUniqueByName(Role.class, Role.GUEST);
     }
     
@@ -168,5 +168,15 @@ public class DAO {
             return null;
         }
         
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static <T> T getUniqueByUsername(Class<T> type, String username) {
+        Query q = createQuery("Select obj from " + type.getName() + " obj where username = ?", username);
+        try {
+            return (T) q.getSingleResult();
+        } catch (NoResultException nre) {
+            return null;
+        }
     }
 }

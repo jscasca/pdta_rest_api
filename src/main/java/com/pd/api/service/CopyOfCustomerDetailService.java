@@ -22,7 +22,6 @@ import com.google.common.collect.Lists;
 
 @Controller
 @RequestMapping(value = "/reg/customer")
-@Secured("ROLE_ADMIN")
 public class CopyOfCustomerDetailService {
 
     @Autowired

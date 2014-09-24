@@ -35,6 +35,10 @@ public class CustomUserData implements UserDetails {
     public void setPassword(String pass) {
         this.password = pass;
     }
+    
+    public void setUsername(String userName) {
+        this.userName = userName;
+    }
 
     public String getUsername() {
         return this.userName;

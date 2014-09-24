@@ -8,49 +8,46 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-public class CustomUserDetailsService implements UserDetailsService {
-    private String USER_ADMIN = "admin";
-    private String PASS_ADMIN = "adminpass";
+import com.pd.api.db.DAO;
+import com.pd.api.entity.Credential;
+import com.pd.api.entity.Role;
 
-    private String USER = "user";
-    private String PASS = "userpass";
+public class CustomUserDetailsService implements UserDetailsService {
 
     public UserDetails loadUserByUsername(String authentication) throws UsernameNotFoundException {
         CustomUserData customUserData = new CustomUserData();
         // You can talk to any of your user details service and get the
         // authentication data and return as CustomUserData object then spring
         // framework will take care of the authentication
-        if (USER_ADMIN.equals(authentication)) {
-            customUserData.setAuthentication(true);
-            customUserData.setPassword(PASS_ADMIN);
-            Collection<CustomRole> roles = new ArrayList<CustomRole>();
-            CustomRole customRole = new CustomRole();
-            customRole.setAuthority("ROLE_ADMIN");
-            roles.add(customRole);
-            customUserData.setAuthorities(roles);
-            return customUserData;
-        } else if (USER.equals(authentication)) {
-            customUserData.setAuthentication(true);
-            customUserData.setPassword(PASS);
-            Collection<CustomRole> roles = new ArrayList<CustomRole>();
-            CustomRole customRole = new CustomRole();
-            customRole.setAuthority("ROLE_USER");
-            roles.add(customRole);
-            customUserData.setAuthorities(roles);
-            return customUserData;
-        } else {
-            return null;
+        Credential credential = DAO.getUniqueByUsername(Credential.class, authentication);
+        if(credential == null) return null;
+        customUserData.setAuthentication(true);
+        customUserData.setUsername(authentication);
+        customUserData.setPassword(credential.getPassword());
+        customUserData.setAuthorities(getCredentialRoles(credential));
+        return customUserData;
+    }
+    
+    private Collection<CustomRole> getCredentialRoles(Credential credential) {
+        Collection<CustomRole> roles = new ArrayList<CustomRole>();
+        for(Role role : credential.getRoles()) {
+            roles.add(new CustomRole(role.getAuthority()));
         }
+        return roles;
     }
 
     /**
-     * Custom Role class for manage the authorities
+     * Custom Role class to manage the authorities
      * 
-     * @author malalanayake
-     * 
+     * @author tin
+     *
      */
     private class CustomRole implements GrantedAuthority {
         String role = null;
+        
+        public CustomRole(String roleName) {
+            this.role = roleName;
+        }
 
         public String getAuthority() {
             return role;

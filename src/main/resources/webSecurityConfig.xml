@@ -8,11 +8,10 @@
       http://www.springframework.org/schema/beans
       http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
-    <http pattern="/reg/**" security="none"/>
     <!-- Rest authentication entry point configuration -->
     <http auto-config="true" use-expressions="true" create-session="stateless"
         entry-point-ref="restServicesEntryPoint" authentication-manager-ref="authenticationManagerForRest">
-        <intercept-url pattern="/reg/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+        <intercept-url pattern="/reg/**" access="permitAll"/>
         <intercept-url pattern="/api/**" />
         <sec:form-login authentication-success-handler-ref="mySuccessHandler" />
         <sec:access-denied-handler ref="myAuthenticationAccessDeniedHandler" />
