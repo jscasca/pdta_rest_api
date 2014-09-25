@@ -5,11 +5,11 @@ import com.pd.api.entity.User;
 
 public class MemberRegistration {
 
-    private String username;
+    public String username;
     
-    private String displayname;
+    public String displayname;
     
-    private String password;
+    public String password;
     
     public MemberRegistration(){}
     public MemberRegistration(String n, String d, String p) {

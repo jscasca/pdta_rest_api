@@ -131,7 +131,7 @@ public class DAO {
     }*/
     
     public static boolean nameAvailable(String name) {
-        Query q = createQuery("Select u from User u where name = ?", name);
+        Query q = createQuery("Select u from User u where username = ?", name);
         try {
             q.getSingleResult();
             return false;
