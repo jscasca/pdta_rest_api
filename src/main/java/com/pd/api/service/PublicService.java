@@ -34,7 +34,7 @@ import com.pd.api.exception.GeneralException;
  *
  */
 @Controller
-@RequestMapping(value = "/reg/public")
+@RequestMapping(value = "/public")
 public class PublicService {
 
     @Autowired
@@ -43,9 +43,7 @@ public class PublicService {
     @RequestMapping(value = "/registration", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public User registerMember(@RequestBody MemberRegistration registration) {
-        User user = PublicServiceImplementation.registerMember(registration);
-        if(user == null) throw new GeneralException("Internal Server Error", "");
-        return user;
+        return PublicServiceImplementation.registerMember(registration);
     }
     
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)

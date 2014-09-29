@@ -45,12 +45,12 @@ public class DataBaseBuilder {
         SchemaUpdate su = new SchemaUpdate(config());
         su.setFormat(true);
         su.setDelimiter(";");
-        su.setOutputFile("src/main/db/posdta-update.sql");
+        su.setOutputFile("src/test/resources/posdta-update.sql");
         su.execute(true, exec);
     }
     
     public static void main(String[] args) {
-        runCreate(false);
-        //runUpdate(false);
+        //runCreate(false);
+        runUpdate(false);
     }
 }

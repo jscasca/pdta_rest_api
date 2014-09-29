@@ -10,6 +10,7 @@ import javax.persistence.Query;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.pd.api.entity.Role;
+import com.pd.api.entity.User;
 
 @Transactional
 public class DAO {
@@ -110,6 +111,10 @@ public class DAO {
     
     //public static <T> List<T> getAll(Class<T> type, String query, ListWrapper lw) {return getAll(type, query, lw.orderBy, lw.first, lw.limit);}
     
+    public static <T> List<T> getAll(Class<T> type, int first, int limit) {
+        return getAll(type, "", "", first, limit);
+    }
+    
     @SuppressWarnings("unchecked")
     public static <T> List<T> getAll(Class<T> type, String query, String orderBy, int first, int limit) {
         Query q = createQuery("Select obj from " + type.getName() + "  obj " + query + orderBy);
@@ -178,5 +183,13 @@ public class DAO {
         } catch (NoResultException nre) {
             return null;
         }
+    }
+    
+    public static User getUserByUsername(String username) {
+        return getUniqueByUsername(User.class, username);
+    }
+    
+    public static User getUserById(Long id) {
+        return get(User.class, id);
     }
 }

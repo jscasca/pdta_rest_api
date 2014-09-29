@@ -17,23 +17,7 @@ public class PublicServiceImplementation {
         Credential credential = registration.getCredentialFromRegistrationForm(newUser);
         DAO.put(newUser);
         DAO.put(credential);
+        if(newUser == null) throw new GeneralException("ex","ex");
         return newUser;
-        
-        /*
-         * if(!DAO.nameAvailable(member.getName()))throw new DuplicateResourceException("User","");
-        User newUser = member.getMemberUser();
-        try {
-            Credential credential = member.getCredential(newUser);
-            DAO.put(newUser);
-            DAO.put(credential);
-            return newUser;
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            throw new GeneralException(e.getMessage(), "");
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-            throw new GeneralException(e.getMessage(), "");
-        }
-         */
     }
 }

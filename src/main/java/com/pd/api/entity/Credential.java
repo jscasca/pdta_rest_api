@@ -17,6 +17,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import com.google.common.collect.Sets;
+import com.pd.api.db.DAO;
 
 /**
  * 
@@ -45,7 +46,7 @@ public class Credential implements Serializable {
     private User user;
     
     public Credential(){}
-    public Credential(User user, String password) { this(user,password, Role.member);}
+    public Credential(User user, String password) { this(user,password, DAO.getMemberRole());}
     public Credential(User user, String password, Role role) {this(user, password, Sets.newHashSet(role));}
     public Credential(User user, String password, Set<Role> roles) {
         this.user = user;
@@ -95,6 +96,6 @@ public class Credential implements Serializable {
     
     @Override
     public String toString() {
-        return username + ":" + id;
+        return username + ":" + id + " [" + user + "]";
     }
 }

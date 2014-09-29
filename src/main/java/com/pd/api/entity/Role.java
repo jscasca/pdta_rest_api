@@ -1,7 +1,6 @@
 package com.pd.api.entity;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,13 +11,11 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
-import org.springframework.security.core.GrantedAuthority;
-
 import com.pd.api.db.DAO;
 
 @Entity
 @Table(name="role")
-public class Role {
+public class Role implements Serializable {
 
     protected static Role member = null, admin = null;
     

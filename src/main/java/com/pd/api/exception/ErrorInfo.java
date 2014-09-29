@@ -4,10 +4,13 @@ public class ErrorInfo {
 
     private String url;
     private String message;
+    private String field;
     
-    public ErrorInfo(String u, String m) {
-        url = u;
-        message = m;
+    public ErrorInfo(String url, String msg) {this(url, msg, "N/A");}
+    public ErrorInfo(String url, String msg, String field) {
+        this.url = url;
+        this.message = msg;
+        this.field = field;
     }
     
     public String getUrl() {
@@ -18,11 +21,19 @@ public class ErrorInfo {
         return message;
     }
     
-    public void setUrl(String u) {
-        url = u;
+    public String getField() {
+        return field;
     }
     
-    public void setMessage(String m) {
-        message = m;
+    public void setUrl(String url) {
+        this.url = url;
+    }
+    
+    public void setMessage(String msg) {
+        this.message = msg;
+    }
+    
+    public void setField(String field) {
+        this.field = field;
     }
 }

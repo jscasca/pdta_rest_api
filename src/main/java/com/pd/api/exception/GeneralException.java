@@ -3,18 +3,23 @@ package com.pd.api.exception;
 public class GeneralException extends RuntimeException {
 
     private final String error;
-    private final String type;
+    private final String message;
     
-    public GeneralException(String error, String type) {
+    public GeneralException(String error, String message) {
         this.error = error;
-        this.type = type;
+        this.message = message;
     }
     
     public String getError() {
         return error;
     }
     
-    public String getType() {
-        return type;
+    public String getMessage() {
+        return message;
+    }
+    
+    public ErrorInfo getErrorInfo(String url) {
+        ErrorInfo errorInfo = new ErrorInfo(url, message);
+        return errorInfo;
     }
 }
