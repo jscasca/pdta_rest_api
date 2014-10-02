@@ -7,8 +7,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
- * Books are the representation in a specific language of an author's work
- * (For example: 'El Hobbit' would be the ES (spanish) representation of the work 'The Hobbit')
+ * Books are the main writing of an author
  * 
  * @author tin
  *
@@ -16,42 +15,43 @@ import javax.persistence.Table;
 @Entity
 @Table(name="book")
 public class Book {
+    
+    public static final String default_icon = "";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id = null;
     
-    private Work work;
+    private Author author;
     
     private String title;
     
-    private Language language;
-    
     private String icon;
     
-    public Book(Work work){this(work, work.getTitle(), work.getLanguage(), work.getIcon());}
-    public Book(Work work, String title, Language language) {this(work, title, language, work.getIcon());}
-    public Book(Work work, String title, Language language, String icon) {
-        this.work = work;
+    private Language language;
+    
+    public Book(Author author, String title, Language language) {this(author, title, Book.default_icon, language);}
+    public Book(Author author, String title, String icon, Language language) {
+        this.author = author;
         this.title = title;
-        this.language = language;
         this.icon = icon;
+        this.language = language;
     }
     
-    public Work getWork() {
-        return work;
+    public Author getAuthor() {
+        return author;
     }
     
-    public String title() {
+    public String getTitle() {
         return title;
-    }
-    
-    public Language getLanguage() {
-        return language;
     }
     
     public String getIcon() {
         return icon;
+    }
+    
+    public Language getLanguage() {
+        return language;
     }
     
     @Override
