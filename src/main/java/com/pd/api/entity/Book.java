@@ -4,6 +4,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -15,31 +18,35 @@ import javax.persistence.Table;
 @Entity
 @Table(name="book")
 public class Book {
-    
-    public static final String default_icon = "";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id = null;
     
-    private Author author;
+    @ManyToOne
+    @JoinColumn(name="work_id")
+    private Work work;
     
     private String title;
     
     private String icon;
     
+    @ManyToOne
+    @JoinColumn(name="language_id")
     private Language language;
     
-    public Book(Author author, String title, Language language) {this(author, title, Book.default_icon, language);}
-    public Book(Author author, String title, String icon, Language language) {
-        this.author = author;
+    public Book() {}
+    public Book(Work work) {this(work, work.getTitle(), work.getIcon(), work.getLanguage());} 
+    public Book(Work work, String title, Language language) {this(work, title, work.getIcon(), language);}
+    public Book(Work work, String title, String icon, Language language) {
+        this.work = work;
         this.title = title;
         this.icon = icon;
         this.language = language;
     }
     
-    public Author getAuthor() {
-        return author;
+    public Work getWork() {
+        return work;
     }
     
     public String getTitle() {
@@ -52,6 +59,22 @@ public class Book {
     
     public Language getLanguage() {
         return language;
+    }
+    
+    public void setWork(Work work) {
+        this.work = work;
+    }
+    
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+    
+    public void setLanguage(Language language) {
+        this.language = language;
     }
     
     @Override

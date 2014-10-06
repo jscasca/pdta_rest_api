@@ -9,6 +9,7 @@ import javax.persistence.Query;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import com.pd.api.entity.Language;
 import com.pd.api.entity.Role;
 import com.pd.api.entity.User;
 
@@ -109,8 +110,6 @@ public class DAO {
         return q;
     }
     
-    //public static <T> List<T> getAll(Class<T> type, String query, ListWrapper lw) {return getAll(type, query, lw.orderBy, lw.first, lw.limit);}
-    
     public static <T> List<T> getAll(Class<T> type, int first, int limit) {
         return getAll(type, "", "", first, limit);
     }
@@ -118,6 +117,18 @@ public class DAO {
     @SuppressWarnings("unchecked")
     public static <T> List<T> getAll(Class<T> type, String query, String orderBy, int first, int limit) {
         Query q = createQuery("Select obj from " + type.getName() + "  obj " + query + orderBy);
+        if(first > 0) {
+            q.setFirstResult(first);
+        }
+        if(limit > 0) {
+            q.setMaxResults(limit);
+        }
+        return q.getResultList();
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static <T> List<T> getAll(Class<T> type, String query, String orderBy, int first, int limit, Object... params) {
+        Query q = createQuery("Select obj from " + type.getName() + "  obj " + query + orderBy, params);
         if(first > 0) {
             q.setFirstResult(first);
         }
@@ -191,5 +202,14 @@ public class DAO {
     
     public static User getUserById(Long id) {
         return get(User.class, id);
+    }
+    
+    public static Language getLanguageByCode(String code) {
+        Query q = createQuery("SELECT obj FROM " + Language.class.getName() + " obj where code = ?", code);
+        try {
+            return (Language)q.getSingleResult();
+        } catch(Exception e) {
+            return null;
+        }
     }
 }

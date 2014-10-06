@@ -19,6 +19,7 @@ public class Language implements Serializable {
     //ISO 639-1: two letter code per lang
     private String code;
     
+    public Language() {}
     public Language(String code) {
         this.code = code;
     }

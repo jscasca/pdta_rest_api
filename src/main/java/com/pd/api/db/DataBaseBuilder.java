@@ -5,9 +5,13 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 
+import com.pd.api.entity.Author;
+import com.pd.api.entity.Book;
 import com.pd.api.entity.Credential;
+import com.pd.api.entity.Language;
 import com.pd.api.entity.Role;
 import com.pd.api.entity.User;
+import com.pd.api.entity.Work;
 
 public class DataBaseBuilder {
 
@@ -19,10 +23,13 @@ public class DataBaseBuilder {
     public static Configuration config() {
         AnnotationConfiguration ac = new AnnotationConfiguration();
         
-        //ac.addAnnotatedClass(Author.class);
+        ac.addAnnotatedClass(Author.class);
+        ac.addAnnotatedClass(Book.class);
         ac.addAnnotatedClass(Credential.class);
+        ac.addAnnotatedClass(Language.class);
         ac.addAnnotatedClass(Role.class);
         ac.addAnnotatedClass(User.class);
+        ac.addAnnotatedClass(Work.class);
         
         ac.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5InnoDBDialect");
         ac.setProperty("hibernate.connection.driver_class", "com.mysql.jdbc.Driver");
