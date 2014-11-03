@@ -42,6 +42,9 @@ public class Posdta {
     
     private int rating;
     
+    public Posdta(BookReading reading, String posdta, int rating) {
+        this(reading.getUser(), reading.getWork(), reading.getBook(), reading.getCreationDate(), posdta, rating);
+    }
     public Posdta(User user, Work work, Book book, Date start, String posdta, int rating) {
         this.user = user;
         this.work = work;

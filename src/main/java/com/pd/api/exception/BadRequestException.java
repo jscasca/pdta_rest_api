@@ -6,7 +6,7 @@ package com.pd.api.exception;
  * @author tin
  *
  */
-public class BadRequestException extends RuntimeException{
+public class BadRequestException extends RuntimeException {
     
     private static final String DEFAULT_FIELD = "N/A";
 

@@ -31,6 +31,9 @@ public class User implements Serializable {
     
     private String icon;
     
+    /**
+     * This set contains all the users that this user is following
+     */
     @ManyToMany(cascade={CascadeType.ALL})
     @JoinTable(name = "followers",
             joinColumns = {@JoinColumn(name = "user_id")},
@@ -73,14 +76,17 @@ public class User implements Serializable {
         this.icon = icon;
     }
     
+    //Set a whole list of people who the user is following
     public void setFollowees(Set<User> followees) {
         this.following = new HashSet<User>(followees);
     }
     
+    //Add a user to the list of people this user is following
     public void addFollowee(User follower) {
         following.add(follower);
     }
     
+    //Stop following a user
     public void removeFollowee(User follower) {
         following.remove(follower);
     }

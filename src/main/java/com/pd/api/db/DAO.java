@@ -78,6 +78,12 @@ public class DAO {
         return obj;
     }
     
+    public static void delete(Object obj) {
+        EntityManager em = getEM();
+        em.remove(obj);
+        em.flush();em.getTransaction().commit();
+    }
+    
     public static <T> T get(Class<T> type, Long id) {
         EntityManager em = getEM();
         return em.find(type, id);
@@ -135,7 +141,37 @@ public class DAO {
         if(limit > 0) {
             q.setMaxResults(limit);
         }
+        return q.getResultList(); 
+    }
+    
+    public static List<User> getAllFromQuery(String query, int first, int limit, Object... params) {
+        Query q = createQuery(query, params);
+        if(first > 0) {
+            q.setFirstResult(first);
+        }
+        if(limit > 0) {
+            q.setMaxResults(limit);
+        }
         return q.getResultList();
+    }
+    
+    public static <T> T getSingle(Class<T> type, String query, Object... params) {
+        Query q = createQuery("Select obj from " + type.getName() + " obj " + query, params);
+        try {
+            return (T) q.getSingleResult();
+        } catch (NoResultException nre) {
+            return null;
+        } catch (NonUniqueResultException nure) {
+            //TODO: log or something
+            return (T) q.getResultList().get(0);
+        }
+    }
+    
+    public static <T> T getFirst(Class<T> type, String query, Object... params) {
+        Query q = createQuery("Select obj from " + type.getName() + " obj " + query, params);
+        List<T> objs = q.getResultList();
+        if(objs.size() == 0) return null;
+        return objs.get(0);
     }
     
     /*public static List<User> getUserFollowers(User u, ListWrapper lw) {

@@ -7,10 +7,14 @@ import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 
 import com.pd.api.entity.Author;
 import com.pd.api.entity.Book;
+import com.pd.api.entity.BookFavorited;
+import com.pd.api.entity.BookReading;
+import com.pd.api.entity.BookWishlisted;
 import com.pd.api.entity.Credential;
 import com.pd.api.entity.Language;
 import com.pd.api.entity.Role;
 import com.pd.api.entity.User;
+import com.pd.api.entity.UserBookInteraction;
 import com.pd.api.entity.Work;
 
 public class DataBaseBuilder {
@@ -25,10 +29,14 @@ public class DataBaseBuilder {
         
         ac.addAnnotatedClass(Author.class);
         ac.addAnnotatedClass(Book.class);
+        ac.addAnnotatedClass(BookFavorited.class);
+        ac.addAnnotatedClass(BookReading.class);
+        ac.addAnnotatedClass(BookWishlisted.class);
         ac.addAnnotatedClass(Credential.class);
         ac.addAnnotatedClass(Language.class);
         ac.addAnnotatedClass(Role.class);
         ac.addAnnotatedClass(User.class);
+        ac.addAnnotatedClass(UserBookInteraction.class);
         ac.addAnnotatedClass(Work.class);
         
         ac.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5InnoDBDialect");

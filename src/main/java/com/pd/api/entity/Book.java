@@ -57,6 +57,10 @@ public class Book {
         return icon;
     }
     
+    public Long getId() {
+        return id;
+    }
+    
     public Language getLanguage() {
         return language;
     }

@@ -27,6 +27,11 @@
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
 
+    <listener>
+        <display-name>cron4j scheduler manager</display-name>
+        <listener-class>com.pd.api.listener.Cron4jScheduler</listener-class>
+    </listener>
+
     <!-- Spring child -->
     <servlet>
         <servlet-name>api</servlet-name>
