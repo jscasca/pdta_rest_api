@@ -25,6 +25,14 @@ public class SearchServiceImplementation {
     
     private static StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_40);
 
+    /**
+     * 
+     * @param queryString
+     * @param start
+     * @param limit
+     * @return
+     * @throws IOException
+     */
     public static List<Book> searchBooks(String queryString, int start, int limit) throws IOException {
         List<Book> books = new LinkedList<Book>();
         try {

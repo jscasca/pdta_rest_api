@@ -82,14 +82,22 @@ public class BookServiceImplementation {
     public static void stopReadingBook(String username, Long bookId) {
         User user = DAO.getUserByUsername(username);
         Book book = DAO.get(Book.class, bookId);
-        //TODO: implement the deleting
+        BookReading reading = DAO.getSingle(BookReading.class, "where user = ? and book = ?", user, book);
+        if(reading == null) throw new InvalidStateException("","","");
+        //TODO: implement the event now delete the reading
+        DAO.delete(reading);
     }
     
     public static Posdta savePosdta(String username, Long bookId, PosdtaWrapper posdtaWrapper) {
         User user = DAO.getUserByUsername(username);
         Book book = DAO.get(Book.class, bookId);
         BookReading reading = DAO.getSingle(BookReading.class, "where user = ? and book = ?", user, book);
-        if(reading == null) throw new InvalidStateException("","","");
+        if(reading == null) throw new InvalidStateException("","",""); //Not reading
+        //Check if there was another posdta
+        Posdta posdta = DAO.getSingle(Posdta.class, "where user = ? and book = ? ", user, book);
+        if(posdta != null) throw new InvalidStateException("","",""); //Duplicate posdta 
+        posdta = posdtaWrapper.getPosdta(reading);
+        
         return null;
     }
     

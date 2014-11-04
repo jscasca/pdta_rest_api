@@ -1,5 +1,8 @@
 package com.pd.api.entity.aux;
 
+import com.pd.api.entity.BookReading;
+import com.pd.api.entity.Posdta;
+
 public class PosdtaWrapper {
 
     public String posdta;
@@ -27,5 +30,9 @@ public class PosdtaWrapper {
     
     public void setRating(int rating) {
         this.rating = rating;
+    }
+    
+    public Posdta getPosdta(BookReading reading) {
+        return new Posdta(reading, posdta, rating);
     }
 }
