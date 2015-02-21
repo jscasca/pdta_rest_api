@@ -23,7 +23,9 @@ public class WorkServiceImplementation {
     }
     
     public static Book createBook(Long id, BookWrapper bookWrapper) {
-        //TODO: impelment
-        return null;
+        Work work = DAO.get(Work.class, id);
+        Book book = bookWrapper.getBook(work);
+        DAO.put(book);
+        return book;
     }
 }

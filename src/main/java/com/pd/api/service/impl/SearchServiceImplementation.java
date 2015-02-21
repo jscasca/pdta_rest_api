@@ -18,7 +18,9 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 
 import com.pd.api.db.DAO;
+import com.pd.api.entity.Author;
 import com.pd.api.entity.Book;
+import com.pd.api.exception.GeneralException;
 import com.pd.api.util.LuceneIndexer;
 
 public class SearchServiceImplementation {
@@ -33,11 +35,11 @@ public class SearchServiceImplementation {
      * @return
      * @throws IOException
      */
-    public static List<Book> searchBooks(String queryString, int start, int limit) throws IOException {
+    public static List<Book> searchBooks(String queryString, int start, int limit) {
         List<Book> books = new LinkedList<Book>();
         try {
             Query query = new QueryParser(Version.LUCENE_40, "title", analyzer).parse(queryString);
-            IndexReader reader = IndexReader.open(FSDirectory.open(new File(LuceneIndexer.INDEX_DIR)));
+            IndexReader reader = IndexReader.open(FSDirectory.open(new File(LuceneIndexer.BOOK_INDEX_DIR)));
             IndexSearcher searcher = new IndexSearcher(reader);
             int numHits = start + limit > 0 ? limit : 1;
             TopScoreDocCollector collector = TopScoreDocCollector.create(numHits, true);
@@ -50,9 +52,38 @@ public class SearchServiceImplementation {
                 books.add(book);
             }
         } catch (ParseException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+            throw new GeneralException("Query parsing exception","The query could not be parsed");
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new GeneralException("Index reading exception", "The index could not be read");
         }
         return books;
+    }
+    
+    public static List<Author> searchAuthors(String queryString, int start, int limit) {
+        List<Author> authors = new LinkedList<Author>();
+        try {
+            Query query = new QueryParser(Version.LUCENE_40, "name", analyzer).parse(queryString);
+            IndexReader reader = IndexReader.open(FSDirectory.open(new File(LuceneIndexer.AUTHOR_INDEX_DIR)));
+            IndexSearcher searcher = new IndexSearcher(reader);
+            int numHits = start + limit > 0 ? limit : 1;
+            TopScoreDocCollector collector = TopScoreDocCollector.create(numHits, true);
+            searcher.search(query, collector);
+            ScoreDoc[] hits = collector.topDocs().scoreDocs;
+            for(int i = start; i < hits.length; i++) {
+                int docId = hits[i].doc;
+                Document d = searcher.doc(docId);
+                Author author = DAO.get(Author.class, Long.parseLong(d.get("id"),10));
+                authors.add(author);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+            throw new GeneralException("Query parsing exception","The query could not be parsed");
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new GeneralException("Index reading exception", "The index could not be read");
+        }
+        return authors;
     }
 }

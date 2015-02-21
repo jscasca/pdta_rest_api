@@ -3,6 +3,7 @@ package com.pd.api;
 import com.pd.api.db.DAO;
 import com.pd.api.entity.Author;
 import com.pd.api.entity.Book;
+import com.pd.api.entity.BookSuggestions;
 import com.pd.api.entity.Credential;
 import com.pd.api.entity.Language;
 import com.pd.api.entity.Role;
@@ -25,7 +26,20 @@ public class ApplicationTest {
 
     public static void main(String[] args) throws IOException {
         //testFavoritesList();
-        testSearch();
+        //testSearch();
+        //testMostRead();
+        testSuggestions();
+    }
+    
+    public static void testSuggestions() {
+        User user = DAO.getUserById(7L);
+        BookServiceImplementation.updateSuggestions(user.getUserName());
+    }
+    
+    public static void testMostRead() {
+        List<Book> mostRead = BookServiceImplementation.getMostRead(0, 10);
+        System.out.println(mostRead);
+        
     }
     
     public static void testFavoritesList() {

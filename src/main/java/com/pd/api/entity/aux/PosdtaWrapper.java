@@ -35,4 +35,9 @@ public class PosdtaWrapper {
     public Posdta getPosdta(BookReading reading) {
         return new Posdta(reading, posdta, rating);
     }
+    
+    @Override
+    public String toString() {
+        return rating + ":" + posdta;
+    }
 }

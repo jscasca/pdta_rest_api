@@ -1,0 +1,63 @@
+## AUTHORS
+Haruki Murakami
+#work Suputoniku no koibito~JA
+#book Sputnik Sweetheart~EN
+#book Sputnik, mi amor~ES
+#work 海辺のカフカ (Umibe no Kafuka)~JA
+#book Kafka en la orilla~ES
+#book Kafka on the shore~EN
+J. R. R. Tolkien
+#work The Hobbit~EN
+#book El Hobbit~ES
+#work The Silmarillion~EN
+#book El Silmarilión~ES
+#work The Lord of the Rings The Fellowship of the Ring~EN
+#book El Señor de los Anillos La Comunidad del Anillo~ES
+#work The Lord of the Rings The Two Towers~EN
+#book El Señor de los Anillos Las Dos Torres~ES
+#work The Lord of the Rings The Return of the King~EN
+#book El Señor de los Anillos El Retorno del Rey~ES
+J. K. Rowling
+#work Harry Potter and the Philosopher's Stone~EN
+#book Harry Potter y la Piedra Filosofal~ES
+#work Harry Potter and the Chamber of Secrets~EN
+#book Harry Potter y la Cámara Secreta~ES
+#work Harry Potter and the Prisoner of Azkaban~EN
+#book Harry Potter y el Prisionero de Azkaban~ES
+#work Harry Potter and the Goblet of Fire~EN
+#book Harry Potter y el Cáliz de Fuego~ES
+#work Harry Potter and the Half-Blood Prince~EN
+#book Harry Potter y el Misterio del Príncipe~ES
+#work Harry Potter and the Deathly Hallows~EN
+#book Harry Potter y las Reliquias de la Muerte~ES
+Juan Rulfo
+#work Talpa~ES
+#work El gallo de oro~ES
+#work Padro Páramo~ES
+#work El Llano en llamas~ES
+#work La vida no es muy seria en sus cosas~ES
+Alelandro Rosas
+#work Sangre y Fuego
+Stephen King
+#work Carrie~EN
+#work Salem's Lot~EN
+#work The Shining~EN
+#work Rage~EN
+#work The stand~EN
+#work The Long Walk~EN
+#work the Dead Zone~EN
+#work Cujo~EN
+
+## USERS
+Oshima el Gorila~root
+Test~test
+Harry Potter~potter
+Frodo Baggins~frodo
+Kafka Tamura~kafka
+Taco~taco
+Timmy Turner~timmy
+Heero Yui~heero
+Duo Maxwell~duo
+Trowa Barton~trowa
+Quatre Raberba~quatre
+Chang Wufei~wufei

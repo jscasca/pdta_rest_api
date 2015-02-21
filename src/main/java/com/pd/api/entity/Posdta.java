@@ -36,12 +36,13 @@ public class Posdta {
     private Date start;
     
     @Type(type="timestamp")
-    private Date finish;
+    private Date finish = new Date();
     
     private String posdta;
     
     private int rating;
     
+    public Posdta() {}
     public Posdta(BookReading reading, String posdta, int rating) {
         this(reading.getUser(), reading.getWork(), reading.getBook(), reading.getCreationDate(), posdta, rating);
     }
@@ -76,5 +77,10 @@ public class Posdta {
     
     public int getRating() {
         return rating;
+    }
+    
+    @Override
+    public String toString() {
+        return "id: " + id + "\nrating: " + rating + "\nposdta: " + posdta;
     }
 }

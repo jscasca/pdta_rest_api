@@ -3,12 +3,14 @@ package com.pd.api.db;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import com.pd.api.entity.Book;
 import com.pd.api.entity.Language;
 import com.pd.api.entity.Role;
 import com.pd.api.entity.User;
@@ -81,8 +83,47 @@ public class DAO {
     public static void delete(Object obj) {
         EntityManager em = getEM();
         em.remove(obj);
-        em.flush();em.getTransaction().commit();
     }
+    /*
+    TODO: fix this bullshit methods
+    public static void remove(Object obj) {
+        EntityManager em = getEM();
+        if(obj != null) {
+            em.remove(obj);
+        }
+    }*/
+    
+    public static <T> T remove(Class<T> type, Long id) {
+        T obj = null;
+        EntityManager em = getEM();
+        EntityTransaction et = em.getTransaction();
+        et.begin();
+        obj = em.find(type, id);
+        if( obj != null) {
+            em.remove(obj);
+        }
+        et.commit();
+        return obj;
+    }
+    
+    /*@Transactional
+    public static <T> int remove(Class<T> type, Long id) {
+        Query query = createQuery("delete " + type.getName() + " obj where obj.id = ?" + id);
+        return query.executeUpdate();
+    }*/
+    
+    /*
+    
+    public static <T> int removeAll(Class<T> type, Project project) {
+        Query query = createQuery("delete " + type.getName() + " obj where obj.project = ?", project);
+        return query.executeUpdate();
+    }
+    
+    public static <T> int removeAll(Class<T> type, Domain domain) {
+        Query query = createQuery("delete " + type.getName() + " obj where obj.domain = ?", domain.getBoxedId());
+        return query.executeUpdate();
+    }
+     */
     
     public static <T> T get(Class<T> type, Long id) {
         EntityManager em = getEM();
@@ -144,7 +185,19 @@ public class DAO {
         return q.getResultList(); 
     }
     
-    public static List<User> getAllFromQuery(String query, int first, int limit, Object... params) {
+    //TODO: check this methods to be a single call
+    public static List<Book> getAllBooksFromQuery(String query, int first, int limit, Object... params) {
+        Query q = createQuery(query, params);
+        if(first > 0) {
+            q.setFirstResult(first);
+        }
+        if(limit > 0) {
+            q.setMaxResults(limit);
+        }
+        return q.getResultList();
+    }
+    
+    public static List<User> getAllUsersFromQuery(String query, int first, int limit, Object... params) {
         Query q = createQuery(query, params);
         if(first > 0) {
             q.setFirstResult(first);

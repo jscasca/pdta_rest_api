@@ -12,6 +12,7 @@ import com.pd.api.exception.BadRequestException;
 import com.pd.api.exception.DuplicateResourceException;
 import com.pd.api.exception.ErrorInfo;
 import com.pd.api.exception.GeneralException;
+import com.pd.api.exception.InvalidStateException;
 
 /**
  * This class handles exceptions by responding with an ErrorInfo object that carries additional information
@@ -54,6 +55,17 @@ public class RestExceptionProcessor extends ResponseEntityExceptionHandler {
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorInfo> badRequest(HttpServletRequest req, DuplicateResourceException ex) {
         return new ResponseEntity<ErrorInfo>(ex.getErrorInfo(req.getRequestURL().toString()), HttpStatus.BAD_REQUEST);
+    }
+    
+    /**
+     * 
+     * @param req
+     * @param ex
+     * @return
+     */
+    @ExceptionHandler(InvalidStateException.class)
+    public ResponseEntity<ErrorInfo> invalidState(HttpServletRequest req, InvalidStateException ex) {
+        return new ResponseEntity<ErrorInfo>(ex.getErrorInfo(req.getRequestURL().toString()), HttpStatus.PRECONDITION_FAILED);
     }
     
 }

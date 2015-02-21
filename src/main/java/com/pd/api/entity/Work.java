@@ -32,6 +32,8 @@ public class Work {
     
     private String icon;
     
+    private Double rating = 0.0;
+    
     @ManyToOne
     @JoinColumn(name="language_id")
     private Language language;
@@ -43,6 +45,11 @@ public class Work {
         this.title = title;
         this.icon = icon;
         this.language = language;
+        this.rating = 0.0;
+    }
+    
+    public Long getId() {
+        return id;
     }
     
     public Author getAuthor() {
@@ -55,6 +62,10 @@ public class Work {
     
     public String getIcon() {
         return icon;
+    }
+    
+    public double getRating() {
+        return rating;
     }
     
     public Language getLanguage() {
@@ -79,6 +90,11 @@ public class Work {
     
     public Book createBook() {
         return new Book(this);
+    }
+    
+    public void updateRating(WorkRating wr) {
+        //TODO: implement
+        this.rating = wr.getAverage();
     }
     
     @Override

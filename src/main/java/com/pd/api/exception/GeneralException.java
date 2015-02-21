@@ -5,6 +5,11 @@ public class GeneralException extends RuntimeException {
     private final String error;
     private final String message;
     
+    /**
+     * Internal Server Exception
+     * @param error
+     * @param message
+     */
     public GeneralException(String error, String message) {
         this.error = error;
         this.message = message;

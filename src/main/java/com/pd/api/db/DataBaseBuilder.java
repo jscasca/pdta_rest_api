@@ -9,13 +9,16 @@ import com.pd.api.entity.Author;
 import com.pd.api.entity.Book;
 import com.pd.api.entity.BookFavorited;
 import com.pd.api.entity.BookReading;
+import com.pd.api.entity.BookSuggestions;
 import com.pd.api.entity.BookWishlisted;
 import com.pd.api.entity.Credential;
 import com.pd.api.entity.Language;
+import com.pd.api.entity.Posdta;
 import com.pd.api.entity.Role;
 import com.pd.api.entity.User;
 import com.pd.api.entity.UserBookInteraction;
 import com.pd.api.entity.Work;
+import com.pd.api.entity.WorkRating;
 
 public class DataBaseBuilder {
 
@@ -32,12 +35,15 @@ public class DataBaseBuilder {
         ac.addAnnotatedClass(BookFavorited.class);
         ac.addAnnotatedClass(BookReading.class);
         ac.addAnnotatedClass(BookWishlisted.class);
+        ac.addAnnotatedClass(BookSuggestions.class);
         ac.addAnnotatedClass(Credential.class);
         ac.addAnnotatedClass(Language.class);
+        ac.addAnnotatedClass(Posdta.class);
         ac.addAnnotatedClass(Role.class);
         ac.addAnnotatedClass(User.class);
         ac.addAnnotatedClass(UserBookInteraction.class);
         ac.addAnnotatedClass(Work.class);
+        ac.addAnnotatedClass(WorkRating.class);
         
         ac.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5InnoDBDialect");
         ac.setProperty("hibernate.connection.driver_class", "com.mysql.jdbc.Driver");

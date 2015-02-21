@@ -1,5 +1,8 @@
 package com.pd.api.service;
 
+import java.util.List;
+import java.util.Set;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.pd.api.entity.Role;
 import com.pd.api.entity.User;
+import com.pd.api.entity.aux.LoggedInWrapper;
 import com.pd.api.security.CustomUserData;
 import com.pd.api.service.impl.MyServiceImplementation;
 
@@ -33,6 +38,12 @@ public class MyService {
     public User findById(@ModelAttribute CustomUserData userData,
             final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
         return MyServiceImplementation.getMe(userData.getUsername());
+    }
+    
+    @RequestMapping(method = RequestMethod.GET, value="/logIn")
+    @ResponseBody
+    public LoggedInWrapper logMeIn(@ModelAttribute CustomUserData userData) {
+        return MyServiceImplementation.logIn(userData.getUsername());
     }
 
 }

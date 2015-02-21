@@ -8,6 +8,7 @@ import com.pd.api.entity.Book;
 import com.pd.api.entity.Work;
 import com.pd.api.entity.aux.AuthorWrapper;
 import com.pd.api.entity.aux.WorkWrapper;
+import com.pd.api.exception.DuplicateResourceException;
 
 public class AuthorServiceImplementation {
 
@@ -27,6 +28,11 @@ public class AuthorServiceImplementation {
     
     public static Author createAuthor(AuthorWrapper authorWrapper) {
       //TODO: implement validations of some sort
+        List<Author> possibleByName = SearchServiceImplementation.searchAuthors(authorWrapper.getName(), 0, 2);
+        if(possibleByName.size() > 0) {
+            //Maybe more validations here
+            throw new DuplicateResourceException("Duplicate Author Name","The author you are trying to create might already exist: [" + possibleByName.get(0) + "]","Author Name");
+        }
         Author author = authorWrapper.getAuthor();
         //Future validations
         DAO.put(author);

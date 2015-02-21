@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.pd.api.db.DAO;
 import com.pd.api.entity.Book;
+import com.pd.api.entity.Posdta;
 import com.pd.api.entity.User;
 import com.pd.api.exception.GeneralException;
 
@@ -38,22 +39,27 @@ public class UserServiceImplementation {
     
     public static List<User> getUserFollowers(Long userId, int first, int limit) {
         User user = DAO.getUserById(userId);
-        DAO.getAll(User.class, "", "", first, limit, user);
-        return null;
+        return DAO.getAllUsersFromQuery("select distinct us from User us where ? in elements(us.following)", first, limit, user);
     }
     
     public static List<User> getUsersFollowing(Long userId, int first, int limit) {
         User user = DAO.getUserById(userId);
-        return null;
+        return DAO.getAllUsersFromQuery("select distinct us.following from User us where us = ?", first, limit, user);
     }
     
     public static List<Book> getUserFavorites(Long userId, int first, int limit) {
-        User user = DAO.getUserById(userId);
-        return null;
+        return DAO.getAllBooksFromQuery("select distinct bw.book from BookWishlisted bw where bw.user.id = ?", first, limit, userId);
     }
     
     public static List<Book> getUserWishlisted(Long userId, int first, int limit) {
-        User user = DAO.getUserById(userId);
-        return null;
+        return DAO.getAllBooksFromQuery("select distinct bw.book from BookWishlisted bw where bw.user.id = ?", first, limit, userId);
+    }
+    
+    public static List<Book> getUserReading(Long userId, int first, int limit) {
+        return DAO.getAllBooksFromQuery("select distinct br.book from BookReading br where br.user.id = ?", first, limit, userId);
+    }
+    
+    public static List<Posdta> getUserPosdtas(Long userId, int first, int limit) {
+        return DAO.getAll(Posdta.class, "where user.id = ?", "", first, limit, userId);
     }
 }

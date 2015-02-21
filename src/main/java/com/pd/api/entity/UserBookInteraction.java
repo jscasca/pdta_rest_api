@@ -40,6 +40,10 @@ public abstract class UserBookInteraction implements Serializable {
         setBook(book);
     }
     
+    public Long getId() {
+        return id;
+    }
+    
     public User getUser() {
         return user;
     }

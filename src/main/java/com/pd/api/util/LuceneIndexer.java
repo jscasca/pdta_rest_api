@@ -15,16 +15,23 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 
 import com.pd.api.db.DAO;
+import com.pd.api.entity.Author;
 import com.pd.api.entity.Book;
 
 public class LuceneIndexer {
     
-    public static final String INDEX_DIR = "./tmp/lucene_index";
+    public static final String BOOK_INDEX_DIR = "./tmp/lucene_book_index";
+    public static final String AUTHOR_INDEX_DIR = "./tmp/lucene_author_index";
 
     public static void index() throws IOException {
+        indexBooks();
+        indexAuthors();
+    }
+    
+    public static void indexBooks() throws IOException {
         StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_40);
         IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40, analyzer);
-        IndexWriter writer = new IndexWriter(FSDirectory.open(new File(INDEX_DIR)), config);
+        IndexWriter writer = new IndexWriter(FSDirectory.open(new File(BOOK_INDEX_DIR)), config);
         
         writer.deleteAll();//index all book names
         List<Book> books = DAO.getAll(Book.class, 0, 0);
@@ -33,6 +40,23 @@ public class LuceneIndexer {
             doc.add(new TextField("title",book.getTitle(), Field.Store.YES));
             doc.add(new StringField("id", book.getId().toString(), Field.Store.YES));
             doc.add(new StringField("type", "BOOK", Field.Store.YES));
+            writer.addDocument(doc);
+        }
+        writer.close();
+    }
+    
+    public static void indexAuthors() throws IOException {
+        StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_40);
+        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40, analyzer);
+        IndexWriter writer = new IndexWriter(FSDirectory.open(new File(AUTHOR_INDEX_DIR)), config);
+        
+        writer.deleteAll();//index all book names
+        List<Author> authors = DAO.getAll(Author.class, 0, 0);
+        for(Author author : authors) {
+            Document doc = new Document();
+            doc.add(new TextField("name",author.getName(), Field.Store.YES));
+            doc.add(new StringField("id", author.getId().toString(), Field.Store.YES));
+            doc.add(new StringField("type", "AUTHOR", Field.Store.YES));
             writer.addDocument(doc);
         }
         writer.close();

@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.pd.api.entity.Book;
+import com.pd.api.entity.Posdta;
 import com.pd.api.entity.User;
 import com.pd.api.security.CustomUserData;
 import com.pd.api.service.impl.UserServiceImplementation;
@@ -24,8 +26,8 @@ public class UserService {
     
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
-    public List<User> findUsers(@RequestParam(value="start", defaultValue="0") int start,
-            @RequestParam(value="limit", defaultValue="10") int limit,
+    public List<User> findUsers(@RequestParam(value="start", defaultValue="0", required = false) int start,
+            @RequestParam(value="limit", defaultValue="10", required = false) int limit,
             final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
         return UserServiceImplementation.getUsers(start, limit);
     }
@@ -37,49 +39,99 @@ public class UserService {
         return UserServiceImplementation.getUserById(id);
     }
     
+    /**
+     * 
+     * @param id
+     * @param start
+     * @param limit
+     * @param uriBuilder
+     * @param response
+     * @return A list of users who are following the selected user
+     */
     @RequestMapping(value = "/{id:[0-9]+}/followers", method = RequestMethod.GET)
     @ResponseBody
-    public List<User> findFollowers(@PathVariable("id") final Long id,
-            @RequestParam(value="start", defaultValue="0") int start,
+    public List<User> findFollowers(@PathVariable("id") final Long userId,
+            @RequestParam(value="start", defaultValue="0") int first,
             @RequestParam(value="limit", defaultValue="10") int limit,
             final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
-        return null;
+        return UserServiceImplementation.getUserFollowers(userId, first, limit);
     }
     
+    /**
+     * 
+     * @param id
+     * @param start
+     * @param limit
+     * @param uriBuilder
+     * @param response
+     * @return A list of users that the selected user follows
+     */
     @RequestMapping(value = "/{id:[0-9]+}/followees", method = RequestMethod.GET)
     @ResponseBody
-    public List<User> findFollowees(@PathVariable("id") final Long id,
-            @RequestParam(value="start", defaultValue="0") int start,
+    public List<User> findFollowees(@PathVariable("id") final Long userId,
+            @RequestParam(value="start", defaultValue="0") int first,
             @RequestParam(value="limit", defaultValue="10") int limit,
             final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
-        return null;
+        return UserServiceImplementation.getUsersFollowing(userId, first, limit);
     }
     
     @Secured("ROLE_USER")
     @RequestMapping(value = "/{id:[0-9]+}/followers", method = RequestMethod.POST)
     @ResponseBody
-    public User followUser(@ModelAttribute CustomUserData userData, @PathVariable("id") final Long id,
+    public User followUser(@ModelAttribute CustomUserData userData, 
+            @PathVariable("id") final Long userId,
             final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
-        return null;
+        return UserServiceImplementation.followUser(userData.getUsername(), userId);
     }
     
     @Secured("ROLE_USER")
     @RequestMapping(value = "/{id:[0-9]+}/followers", method = RequestMethod.DELETE)
     @ResponseBody
-    public User unfollowUser(@ModelAttribute CustomUserData userData, @PathVariable("id") final Long id,
+    public User unfollowUser(@ModelAttribute CustomUserData userData, 
+            @PathVariable("id") final Long userId,
             final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
-        return null;
+        return UserServiceImplementation.unfollowUser(userData.getUsername(), userId);
     }
     
     //Get user posdtas
+    @RequestMapping(value = "/{id:[0-9]+}/posdtas", method = RequestMethod.GET)
+    @ResponseBody
+    public List<Posdta> getPosdtas(@PathVariable("id") final Long userId,
+            @RequestParam(value="start", defaultValue="0") int first,
+            @RequestParam(value="limit", defaultValue="10") int limit,
+            final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
+        return UserServiceImplementation.getUserPosdtas(userId, first, limit);
+    }
     
     //get user wishlist
+    @RequestMapping(value = "/{id:[0-9]+}/wishlists", method = RequestMethod.GET)
+    @ResponseBody
+    public List<Book> getWishlisted(@PathVariable("id") final Long userId,
+            @RequestParam(value="start", defaultValue="0") int first,
+            @RequestParam(value="limit", defaultValue="10") int limit,
+            final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
+        return UserServiceImplementation.getUserWishlisted(userId, first, limit);
+    }
     
     //get user favorites
+    @RequestMapping(value = "/{id:[0-9]+}/favorites", method = RequestMethod.GET)
+    @ResponseBody
+    public List<Book> getFavorites(@PathVariable("id") final Long userId,
+            @RequestParam(value="start", defaultValue="0") int first,
+            @RequestParam(value="limit", defaultValue="10") int limit,
+            final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
+        return UserServiceImplementation.getUserFavorites(userId, first, limit);
+    }
     
     //get user reading
-    
-    //get user read
+    @RequestMapping(value = "/{id:[0-9]+}/readings", method = RequestMethod.GET)
+    @ResponseBody
+    public List<Book> getReading(@PathVariable("id") final Long userId,
+            @RequestParam(value="start", defaultValue="0") int first,
+            @RequestParam(value="limit", defaultValue="10") int limit,
+            final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
+        return UserServiceImplementation.getUserReading(userId, first, limit);
+    }
     
     //get user ...
 }

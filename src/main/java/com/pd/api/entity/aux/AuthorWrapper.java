@@ -14,6 +14,10 @@ public class AuthorWrapper {
         this.icon = icon;
     }
     
+    public String getName() {
+        return name;
+    }
+    
     public Author getAuthor() {
         return new Author(name, icon == "" ? Author.default_icon : icon);
     }
