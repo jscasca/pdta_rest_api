@@ -1,0 +1,14 @@
+# Local builds #
+################
+target/
+
+# Logs and databases #
+######################
+*.log
+*.sql
+!createdb.sql
+
+# Miscellaneous #
+#################
+*~
+*.bak
