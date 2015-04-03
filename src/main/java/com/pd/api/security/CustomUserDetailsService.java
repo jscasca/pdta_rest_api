@@ -15,17 +15,19 @@ import com.pd.api.entity.Role;
 public class CustomUserDetailsService implements UserDetailsService {
 
     public UserDetails loadUserByUsername(String authentication) throws UsernameNotFoundException {
-        CustomUserData customUserData = new CustomUserData();
+        //CustomUserData customUserData = new CustomUserData();
         // You can talk to any of your user details service and get the
         // authentication data and return as CustomUserData object then spring
         // framework will take care of the authentication
+        //TODO: try storing the user id from here to save the user in cache
         Credential credential = DAO.getUniqueByUsername(Credential.class, authentication);
         if(credential == null) return null;
-        customUserData.setAuthentication(true);
+        /*customUserData.setAuthentication(true);
         customUserData.setUsername(authentication);
         customUserData.setPassword(credential.getPassword());
-        customUserData.setAuthorities(getCredentialRoles(credential));
-        return customUserData;
+        customUserData.setAuthorities(getCredentialRoles(credential));*/
+        CustomUserData user = new CustomUserData(authentication, credential.getPassword(), getCredentialRoles(credential));
+        return user;
     }
     
     private Collection<CustomRole> getCredentialRoles(Credential credential) {
