@@ -4,20 +4,28 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public class CustomUserData implements UserDetails {
     Collection<? extends GrantedAuthority> list = null;
-    String userName = null;
+    String username = null;
     String password = null;
     boolean status = false;
-
-    public CustomUserData() {
-        list = new ArrayList<GrantedAuthority>();
+    
+    public CustomUserData(User user) {
+        this(user.getUsername(), user.getPassword(), user.getAuthorities());
     }
 
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.list;
+    public CustomUserData(String username, String password, Collection<? extends GrantedAuthority> authorities) {
+        //super(username, password, authorities);
+        this.username = username;
+        this.password = password;
+        list = authorities;
+    }
+
+    public Collection<GrantedAuthority> getAuthorities() {
+        return (Collection<GrantedAuthority>) this.list;
     }
 
     public void setAuthorities(Collection<? extends GrantedAuthority> roles) {
@@ -37,11 +45,11 @@ public class CustomUserData implements UserDetails {
     }
     
     public void setUsername(String userName) {
-        this.userName = userName;
+        this.username = userName;
     }
 
     public String getUsername() {
-        return this.userName;
+        return this.username;
     }
 
     public boolean isAccountNonExpired() {

@@ -1,5 +1,6 @@
 package com.pd.api.service;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Set;
 
@@ -8,6 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +27,7 @@ import com.pd.api.service.impl.MyServiceImplementation;
 @Controller
 @RequestMapping(value = "/api/me")
 @Secured({"ROLE_USER","ROLE_ADMIN"})
-public class MyService {
+public class MyService extends AbstractService {
 
     @Autowired
     private ApplicationEventPublisher eventPublisher;
@@ -36,7 +39,12 @@ public class MyService {
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
     public User findById(@ModelAttribute CustomUserData userData,
+            final Principal principal,
             final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
+        
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserData cu = loadUserFromSecurityContext();
+        String as = auth.toString();
         return MyServiceImplementation.getMe(userData.getUsername());
     }
     
