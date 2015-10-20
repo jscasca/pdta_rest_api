@@ -12,6 +12,8 @@ import com.pd.api.exception.BadRequestException;
 import com.pd.api.exception.DuplicateResourceException;
 import com.pd.api.exception.ErrorInfo;
 import com.pd.api.exception.GeneralException;
+import com.pd.api.exception.InvalidAuthenticationException;
+import com.pd.api.exception.InvalidParameterException;
 import com.pd.api.exception.InvalidStateException;
 
 /**
@@ -26,13 +28,7 @@ public class RestExceptionProcessor extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(GeneralException.class)
     public ResponseEntity<ErrorInfo> internalError(HttpServletRequest req, GeneralException ex) {
-        String errorMessage = "";
-        
-        errorMessage += ex.getError();
-        String errorURL = req.getRequestURL().toString();
-        
-        ErrorInfo e = new ErrorInfo(errorURL, errorMessage);
-        return new ResponseEntity<ErrorInfo>(e, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<ErrorInfo>(ex.getErrorInformation(req.getRequestURL().toString()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
     
     /**
@@ -43,7 +39,7 @@ public class RestExceptionProcessor extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(DuplicateResourceException.class)
     public ResponseEntity<ErrorInfo> duplicateResource(HttpServletRequest req, DuplicateResourceException ex) {
-        return new ResponseEntity<ErrorInfo>(ex.getErrorInfo(req.getRequestURL().toString()), HttpStatus.CONFLICT);
+        return new ResponseEntity<ErrorInfo>(ex.getErrorInformation(req.getRequestURL().toString()), HttpStatus.CONFLICT);
     }
     
     /**
@@ -54,7 +50,7 @@ public class RestExceptionProcessor extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorInfo> badRequest(HttpServletRequest req, DuplicateResourceException ex) {
-        return new ResponseEntity<ErrorInfo>(ex.getErrorInfo(req.getRequestURL().toString()), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<ErrorInfo>(ex.getErrorInformation(req.getRequestURL().toString()), HttpStatus.BAD_REQUEST);
     }
     
     /**
@@ -65,7 +61,29 @@ public class RestExceptionProcessor extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(InvalidStateException.class)
     public ResponseEntity<ErrorInfo> invalidState(HttpServletRequest req, InvalidStateException ex) {
-        return new ResponseEntity<ErrorInfo>(ex.getErrorInfo(req.getRequestURL().toString()), HttpStatus.PRECONDITION_FAILED);
+        return new ResponseEntity<ErrorInfo>(ex.getErrorInformation(req.getRequestURL().toString()), HttpStatus.PRECONDITION_FAILED);
+    }
+    
+    /**
+     * 
+     * @param req
+     * @param ex
+     * @return
+     */
+    @ExceptionHandler(InvalidAuthenticationException.class)
+    public ResponseEntity<ErrorInfo> invalidAuth(HttpServletRequest req, InvalidAuthenticationException ex) {
+        return new ResponseEntity<ErrorInfo>(ex.getErrorInformation(req.getRequestURL().toString()), HttpStatus.UNAUTHORIZED);
+    }
+    
+    /**
+     * 
+     * @param req
+     * @param ex
+     * @return
+     */
+    @ExceptionHandler(InvalidParameterException.class)
+    public ResponseEntity<ErrorInfo> invalidParameter(HttpServletRequest req, InvalidAuthenticationException ex) {
+        return new ResponseEntity<ErrorInfo>(ex.getErrorInformation(req.getRequestURL().toString()), HttpStatus.NOT_ACCEPTABLE);
     }
     
 }

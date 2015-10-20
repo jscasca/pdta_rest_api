@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.pd.api.entity.Author;
+import com.pd.api.entity.Book;
 import com.pd.api.entity.Work;
 import com.pd.api.entity.aux.AuthorWrapper;
 import com.pd.api.entity.aux.WorkWrapper;
@@ -61,5 +62,14 @@ public class AuthorService {
     @ResponseBody
     public Work createWork(@RequestBody WorkWrapper workWrapper, @PathVariable("id") final Long id) {
         return AuthorServiceImplementation.createWork(id, workWrapper);
+    }
+    
+    @RequestMapping(value="/{id:[0-9]+}/books", method = RequestMethod.GET)
+    @ResponseBody
+    public List<Book> authorBooks(@PathVariable("id") final Long id,
+            @RequestParam(value="start", defaultValue="0") int start,
+            @RequestParam(value="limit", defaultValue="10") int limit,
+            final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
+        return AuthorServiceImplementation.getAuthorBooks(id, start, limit);
     }
 }

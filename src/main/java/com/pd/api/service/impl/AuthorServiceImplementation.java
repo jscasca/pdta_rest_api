@@ -26,12 +26,18 @@ public class AuthorServiceImplementation {
         return DAO.getAll(Work.class, " where author = ? ", "", first, limit, author);
     }
     
+    public static List<Book> getAuthorBooks(Long id, int first, int limit) {
+        //TODO: implement
+        Author author = DAO.get(Author.class, id);
+        return DAO.getAll(Book.class, " where work.author = ? ", "", first, limit, author);
+    }
+    
     public static Author createAuthor(AuthorWrapper authorWrapper) {
       //TODO: implement validations of some sort
         List<Author> possibleByName = SearchServiceImplementation.searchAuthors(authorWrapper.getName(), 0, 2);
         if(possibleByName.size() > 0) {
             //Maybe more validations here
-            throw new DuplicateResourceException("Duplicate Author Name","The author you are trying to create might already exist: [" + possibleByName.get(0) + "]","Author Name");
+            throw new DuplicateResourceException("The author [" + authorWrapper.getAuthor() + "] might already exist: [" + possibleByName.get(0) + "]");
         }
         Author author = authorWrapper.getAuthor();
         //Future validations

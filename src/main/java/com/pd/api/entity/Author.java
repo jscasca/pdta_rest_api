@@ -7,6 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 /**
  * Authors publish works, works are represented by books and book by publications that users can read
@@ -28,6 +29,9 @@ public class Author implements Serializable {
     
     private String icon;
     
+    @Transient
+    private String className = "Author";
+    
     public Author() {}
     public Author(String name){ this(name, Author.default_icon);}
     public Author(String name, String icon) {
@@ -46,6 +50,8 @@ public class Author implements Serializable {
     public String getIcon() {
         return icon;
     }
+    
+    public String getClassName() {return className;}
     
     public void setName(String name) {
         this.name = name;

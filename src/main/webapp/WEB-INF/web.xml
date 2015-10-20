@@ -32,6 +32,11 @@
         <listener-class>com.pd.api.listener.Cron4jScheduler</listener-class>
     </listener>
 
+    <listener>
+        <display-name>Context Load Listener</display-name>
+        <listener-class>com.pd.api.listener.ContextLoadListener</listener-class>
+    </listener>
+
     <!-- Spring child -->
     <servlet>
         <servlet-name>api</servlet-name>

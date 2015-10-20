@@ -35,7 +35,7 @@ public class WorkWrapper {
     
     public Work getWork(Author author) {
         Language lang = DAO.getLanguageByCode(language);
-        if(lang == null) throw new BadRequestException("Uncomprensible Language Code", "The requested language code does not exist", "language");
-        return new Work(author, title, icon == "" ? Work.default_icon : icon, lang);
+        if(lang == null) throw new BadRequestException("The requested language code [" + language + "] does not exist");
+        return new Work(author, title, icon == "" ? Work.DEFAULT_ICON : icon, icon == "" ? Work.DEFAULT_THUMBNAIL : icon, lang);
     }
 }

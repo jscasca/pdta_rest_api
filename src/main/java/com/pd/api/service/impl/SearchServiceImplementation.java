@@ -22,6 +22,7 @@ import com.pd.api.entity.Author;
 import com.pd.api.entity.Book;
 import com.pd.api.exception.GeneralException;
 import com.pd.api.util.LuceneIndexer;
+import com.pd.api.util.search.LuceneSearcher;
 
 public class SearchServiceImplementation {
     
@@ -39,7 +40,7 @@ public class SearchServiceImplementation {
         List<Book> books = new LinkedList<Book>();
         try {
             Query query = new QueryParser(Version.LUCENE_40, "title", analyzer).parse(queryString);
-            IndexReader reader = IndexReader.open(FSDirectory.open(new File(LuceneIndexer.BOOK_INDEX_DIR)));
+            IndexReader reader = IndexReader.open(FSDirectory.open(new File(LuceneIndexer.INDEX_DIR)));
             IndexSearcher searcher = new IndexSearcher(reader);
             int numHits = start + limit > 0 ? limit : 1;
             TopScoreDocCollector collector = TopScoreDocCollector.create(numHits, true);
@@ -53,19 +54,70 @@ public class SearchServiceImplementation {
             }
         } catch (ParseException e) {
             e.printStackTrace();
-            throw new GeneralException("Query parsing exception","The query could not be parsed");
+            throw new GeneralException("The query could not be parsed");
         } catch (IOException e) {
             e.printStackTrace();
-            throw new GeneralException("Index reading exception", "The index could not be read");
+            throw new GeneralException("The index could not be read");
         }
         return books;
+    }
+    
+    /*
+    private IndexSearcher searcher = null;
+    private QueryParser parser = null;
+    public SearchEngine() throws IOException {
+        searcher = new IndexSearcher(DirectoryReader.open(FSDirectory.open(new File("index-directory"))));
+        parser = new QueryParser("content", new StandardAnalyzer());
+    }
+
+    public TopDocs performSearch(String queryString, int n)
+    throws IOException, ParseException {
+        Query query = parser.parse(queryString);
+        return searcher.search(query, n);
+    }
+
+    public Document getDocument(int docId)
+    throws IOException {
+        return searcher.doc(docId);
+    }
+    */
+    public static List<Object> findAnything(String queryString, int start, int limit) {
+        List<Object> results = new LinkedList<Object>();
+        try {
+            LuceneSearcher searcher = new LuceneSearcher();
+            List<Document> docs = searcher.search(queryString, start, limit);
+            for(int i = 0; i < docs.size(); i++) {
+                Document d = docs.get(i);
+                Object o = getObjectFromDocument(d);
+                if(o != null )results.add(o);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+            throw new GeneralException("The query could not be parsed");
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new GeneralException("The index could not be read");
+        }
+        return results;
+    }
+    
+    private static Object getObjectFromDocument(Document doc) {
+        String type = doc.get("type");
+        long id = doc.getField("id").numericValue().longValue();
+        if(LuceneIndexer.BOOK_TYPE.equals(type)) {
+            return DAO.get(Book.class, id);
+        }
+        if(LuceneIndexer.AUTHOR_TYPE.equals(type)) {
+            return DAO.get(Author.class, id);
+        }
+        return null;
     }
     
     public static List<Author> searchAuthors(String queryString, int start, int limit) {
         List<Author> authors = new LinkedList<Author>();
         try {
             Query query = new QueryParser(Version.LUCENE_40, "name", analyzer).parse(queryString);
-            IndexReader reader = IndexReader.open(FSDirectory.open(new File(LuceneIndexer.AUTHOR_INDEX_DIR)));
+            IndexReader reader = IndexReader.open(FSDirectory.open(new File(LuceneIndexer.INDEX_DIR)));
             IndexSearcher searcher = new IndexSearcher(reader);
             int numHits = start + limit > 0 ? limit : 1;
             TopScoreDocCollector collector = TopScoreDocCollector.create(numHits, true);
@@ -79,10 +131,10 @@ public class SearchServiceImplementation {
             }
         } catch (ParseException e) {
             e.printStackTrace();
-            throw new GeneralException("Query parsing exception","The query could not be parsed");
+            throw new GeneralException("The query could not be parsed");
         } catch (IOException e) {
             e.printStackTrace();
-            throw new GeneralException("Index reading exception", "The index could not be read");
+            throw new GeneralException("The index could not be read");
         }
         return authors;
     }

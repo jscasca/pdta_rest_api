@@ -17,6 +17,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.pd.api.entity.Book;
 import com.pd.api.entity.Posdta;
 import com.pd.api.entity.User;
+import com.pd.api.entity.aux.UserInfo;
+import com.pd.api.entity.aux.UserToUser;
 import com.pd.api.security.CustomUserData;
 import com.pd.api.service.impl.UserServiceImplementation;
 
@@ -37,6 +39,21 @@ public class UserService {
     public User findById(@PathVariable("id") final Long id,
             final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
         return UserServiceImplementation.getUserById(id);
+    }
+
+    @RequestMapping(value = "/{id:[0-9]+}/info", method = RequestMethod.GET)
+    @ResponseBody
+    public UserInfo getUserInfo(@PathVariable("id") final Long id,
+            final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
+        return UserServiceImplementation.getUserInfo(id);
+    }
+    
+    @Secured("ROLE_USER")
+    @RequestMapping(value= "/{id:[0-9]+}/interactions", method = RequestMethod.GET)
+    @ResponseBody
+    public UserToUser getUserInteractions(@PathVariable("id") final Long userId,
+            @ModelAttribute final CustomUserData userData) {
+        return UserServiceImplementation.getUserInteractions(userData.getUsername(), userId);
     }
     
     /**

@@ -21,6 +21,7 @@ import com.pd.api.entity.Book;
 import com.pd.api.entity.NewBookRequest;
 import com.pd.api.entity.Posdta;
 import com.pd.api.entity.User;
+import com.pd.api.entity.aux.BookInfo;
 import com.pd.api.entity.aux.BookRequestWrapper;
 import com.pd.api.entity.aux.PosdtaWrapper;
 import com.pd.api.entity.aux.UserToBook;
@@ -233,10 +234,21 @@ public class BookService {
         return BookServiceImplementation.getUserToBookInteraction(userData.getUsername(), bookId);
     }
     
+    /**
+     * Get the book info and statistics
+     * @param bookId
+     * @return
+     */
+    @RequestMapping(value="/{id:[0-9]+}/info", method = RequestMethod.GET)
+    @ResponseBody
+    public BookInfo getInfo(@PathVariable("id") final Long bookId) {
+        return BookServiceImplementation.getBookInfo(bookId);
+    }
+    
     @Secured("ROLE_USER")
     @RequestMapping(value="/requests", method = RequestMethod.POST)
     @ResponseBody
-    public NewBookRequest requestNewBook(@ModelAttribute final CustomUserData userData,
+    public Book requestNewBook(@ModelAttribute final CustomUserData userData,
             @RequestBody final BookRequestWrapper newRequestWrapper) {
         return BookServiceImplementation.requestNewBook(userData.getUsername(), newRequestWrapper);
     }

@@ -49,25 +49,25 @@ public class UserToBook {
     }
     
     private void updateReading() {
-        BookReading bookReading = DAO.getSingle(BookReading.class, "where user = ? and book = ?", user, book);
+        BookReading bookReading = DAO.getUnique(BookReading.class, "where user = ? and book = ?", user, book);
         if(bookReading != null) reading = true;
         else reading = false;
     }
     
     private void updateWishlist() {
-        BookWishlisted bookWishlisted = DAO.getSingle(BookWishlisted.class, "where user = ? and book = ?", user, book);
+        BookWishlisted bookWishlisted = DAO.getUnique(BookWishlisted.class, "where user = ? and book = ?", user, book);
         if(bookWishlisted != null) wishlisted = true;
         else wishlisted = false;
     }
     
     private void updateFavorite() {
-        BookFavorited bookFavorited = DAO.getSingle(BookFavorited.class, "where user = ? and book = ? ", user, book);
+        BookFavorited bookFavorited = DAO.getUnique(BookFavorited.class, "where user = ? and book = ? ", user, book);
         if(bookFavorited != null) favorite = true;
         else favorite = false;
     }
     
     private void updatePosdta() {
-        Posdta bookPosdta = DAO.getSingle(Posdta.class, "where user = ? and book = ?", user, book);
+        Posdta bookPosdta = DAO.getUnique(Posdta.class, "where user = ? and book = ?", user, book);
         if(bookPosdta != null) posdta = true;
         else posdta = false;
     }
