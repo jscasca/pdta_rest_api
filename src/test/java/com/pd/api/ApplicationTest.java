@@ -49,7 +49,7 @@ public class ApplicationTest {
     
     public static void testSearch() throws IOException {
         //index first
-        LuceneIndexer.index();
+        //LuceneIndexer.index();
         System.out.println("done indexing");
         List<Book> bookRetrieved = SearchServiceImplementation.searchBooks("sputnik", 0, 10);
         System.out.println(bookRetrieved);

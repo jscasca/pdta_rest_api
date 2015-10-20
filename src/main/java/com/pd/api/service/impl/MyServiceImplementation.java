@@ -14,7 +14,7 @@ public class MyServiceImplementation {
 
     public static User getMe(String username) {
         User user = DAO.getUserByUsername(username);
-        if(user == null) throw new GeneralException("","");
+        if(user == null) throw new GeneralException("User is null");
         return user;
     }
     

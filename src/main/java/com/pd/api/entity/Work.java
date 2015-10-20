@@ -7,6 +7,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 /**
  * 
@@ -17,8 +18,9 @@ import javax.persistence.Table;
 @Entity
 @Table(name="work")
 public class Work {
-
-    public static final String default_icon = "";
+    
+    public static final String DEFAULT_ICON = "http://posdta.com/web/img/default.png";
+    public static final String DEFAULT_THUMBNAIL = "http://posdta.com/web/img/defaultthumb.png";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -32,18 +34,24 @@ public class Work {
     
     private String icon;
     
+    private String thumbnail;
+    
     private Double rating = 0.0;
     
     @ManyToOne
     @JoinColumn(name="language_id")
     private Language language;
     
+    @Transient
+    private String className = "Work";
+    
     public Work() {}
-    public Work(Author author, String title, Language language) {this(author, title, Work.default_icon, language);}
-    public Work(Author author, String title, String icon, Language language) {
+    public Work(Author author, String title, Language language) {this(author, title, DEFAULT_ICON, DEFAULT_THUMBNAIL, language);}
+    public Work(Author author, String title, String icon, String thumbnail, Language language) {
         this.author = author;
         this.title = title;
         this.icon = icon;
+        this.thumbnail = thumbnail;
         this.language = language;
         this.rating = 0.0;
     }
@@ -64,6 +72,10 @@ public class Work {
         return icon;
     }
     
+    public String getThumbnail() {
+        return thumbnail;
+    }
+    
     public double getRating() {
         return rating;
     }
@@ -82,6 +94,10 @@ public class Work {
     
     public void setIcon(String icon) {
         this.icon = icon;
+    }
+    
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
     }
     
     public void setLanguage(Language language) {

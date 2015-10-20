@@ -262,6 +262,19 @@
             <artifactId>log4j-over-slf4j</artifactId>
             <version>${org.slf4j.version}</version>
         </dependency>
+        
+        <!-- MAIL -->
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4.7</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>javax.mail-api</artifactId>
+            <version>1.5.2</version>
+        </dependency>
 
         <!-- test scoped -->
 

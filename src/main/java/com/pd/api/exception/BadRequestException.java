@@ -6,35 +6,10 @@ package com.pd.api.exception;
  * @author tin
  *
  */
-public class BadRequestException extends RuntimeException {
+public class BadRequestException extends ApiException {
     
-    private static final String DEFAULT_FIELD = "N/A";
-
-    private String error;
-    private String message;
-    private String field;
-
-    public BadRequestException(String error) {this(error, error);}
-    public BadRequestException(String error, String message) {this(error, message, BadRequestException.DEFAULT_FIELD);}
-    public BadRequestException(String error, String message, String field) {
-        this.error = error;
-        this.message = message;
-        this.field = field;
-    }
-    
-    public String getError() {
-        return error;
-    }
-    
-    public String getMessage() {
-        return message;
-    }
-    
-    public String getField() {
-        return field;
-    }
-    
-    public ErrorInfo getErrorInfo(String url) {
-        return new ErrorInfo(url, message, field);
-    }
+    public BadRequestException() {super();}
+    public BadRequestException(String message){ super(message);}
+    public BadRequestException(String message, Throwable t) {super(message, t);}
+    public BadRequestException(Throwable t) {super(t);}
 }

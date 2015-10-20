@@ -12,7 +12,7 @@ CREATE USER 'query'@'localhost' IDENTIFIED BY 'notquery';
 
 # Create the database
 DROP DATABASE IF EXISTS posdta_1_0;
-CREATE DATABASE postda_1_0 DEFAULT CHARACTERS SET utf8 DEFAULT COLLATE utf8_general_ci;
+CREATE DATABASE postda_1_0 DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
 USE posdta_1_0;
 
 # Grant privileges to user

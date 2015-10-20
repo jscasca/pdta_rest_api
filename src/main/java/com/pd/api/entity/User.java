@@ -3,6 +3,8 @@ package com.pd.api.entity;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -12,13 +14,14 @@ import javax.persistence.Id;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.JoinColumn;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 @Entity
 @Table(name="user", uniqueConstraints = @UniqueConstraint(columnNames = { "username" }))
 public class User implements Serializable {
-    
+
     public static final String default_icon = "";
 
     @Id
@@ -44,6 +47,7 @@ public class User implements Serializable {
     //private Set<User> followers;
     
     public User(){}
+    public User(String userName) { this(userName, userName, User.default_icon);}
     public User(String userName, String displayName) { this(userName, displayName, User.default_icon);}
     public User(String userName, String displayName, String icon) {
         this.username = userName;
@@ -94,5 +98,12 @@ public class User implements Serializable {
     @Override
     public String toString() {
         return username + ":" + id;
+    }
+    
+    @PrePersist
+    public void onPrePersist() {
+        if(!Credential.isValidUsername(username)) {
+            throw new IllegalArgumentException("The username is not valid");
+        }
     }
 }

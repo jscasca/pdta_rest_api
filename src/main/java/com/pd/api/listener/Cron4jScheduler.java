@@ -10,7 +10,7 @@ import javax.servlet.ServletContextListener;
 
 import com.pd.api.util.LuceneIndexer;
 
-public class Cron4jScheduler  implements ServletContextListener {
+public class Cron4jScheduler implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent event) {
@@ -37,12 +37,13 @@ public class Cron4jScheduler  implements ServletContextListener {
                 System.out.println("Runing the indexer");
                 //Run the indexing
                 long startTime = System.nanoTime();
-                try {
-                    LuceneIndexer.index();
+                /*try {
+                    LuceneIndexer indexer = LuceneIndexer.getInstance();
+                    indexer.index();
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
-                }
+                }*/
                 long endTime = System.nanoTime();
                 System.out.println("Indexing took [" + (endTime - startTime)/1000000 + "] miliseconds");
             }

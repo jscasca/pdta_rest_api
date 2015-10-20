@@ -35,7 +35,7 @@ public class BookWrapper {
     
     public Book getBook(Work work) throws BadRequestException {
         Language lang = DAO.getLanguageByCode(language);
-        if(lang == null) throw new BadRequestException("Uncomprensible Language Code", "The requested language code does not exist", "language");
-        return new Book(work, title, icon == "" ? work.getIcon() : icon, lang);
+        if(lang == null) throw new BadRequestException("The requested language code [" + language + "] does not exist");
+        return new Book(work, title, icon == "" ? work.getIcon() : icon,icon == "" ? work.getIcon() : icon, lang);
     }
 }
