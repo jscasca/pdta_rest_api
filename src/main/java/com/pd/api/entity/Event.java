@@ -59,6 +59,7 @@ public class Event {
     @Enumerated(EnumType.STRING)
     private EventType type;
     
+    protected Event() {}
     //Event type
     protected Event(User user, EventType type) {
         this.user = user;
