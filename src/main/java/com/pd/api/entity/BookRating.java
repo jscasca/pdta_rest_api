@@ -3,6 +3,7 @@ package com.pd.api.entity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 @Entity
@@ -18,6 +19,7 @@ public class BookRating {
     private int rated3;
     private int rated4;
     private int rated5;
+    private double rated = 0;
     private int reading;
     private int wishlisted;
     private int favorited;
@@ -31,9 +33,15 @@ public class BookRating {
         rated3 = r3;
         rated4 = r4;
         rated5 = r5;
+        calculateRating();
         reading = ring;
         wishlisted = wish;
         favorited = fav;
+    }
+    
+    private void calculateRating() {
+        if((rated1 + rated2 + rated3 + rated4 + rated5)>=1)
+        rated = ((rated1 + (rated2*2) + (rated3*3) + (rated4*4) + (rated5*5))/(double)(rated1 + rated2 + rated3 + rated4 + rated5));
     }
     
     public void addReading() { reading++; }
@@ -61,6 +69,7 @@ public class BookRating {
     public int getReading() { return reading;}
     public int getWishlisted() { return wishlisted;}
     public int getFavorited() { return favorited;}
+    public double getRating() {return rated;}
     
     public void setRated1(int r) { rated1 = r;}
     public void setRated2(int r) { rated2 = r;}
@@ -71,5 +80,8 @@ public class BookRating {
     public void setWishlisted(int r) { wishlisted = r;}
     public void setFavorited(int r) {favorited = r;}
     
-    
+    @PrePersist
+    public void updateRating() {
+        calculateRating();
+    }
 }
