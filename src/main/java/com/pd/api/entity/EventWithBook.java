@@ -15,6 +15,8 @@ public class EventWithBook extends Event {
     @JoinColumn(name="book_id")
     private Book book;
     
+    protected EventWithBook() {}
+    
     protected EventWithBook(User user, EventType type, Book book) {
         super(user, type);
         this.book = book;

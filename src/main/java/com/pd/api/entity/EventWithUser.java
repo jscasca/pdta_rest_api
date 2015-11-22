@@ -15,6 +15,8 @@ public class EventWithUser extends Event{
     @JoinColumn(name="target_id")
     private User target;
     
+    protected EventWithUser() {}
+    
     public EventWithUser(User user, EventType type, User target) {
         super(user, type);
         this.target = target;
