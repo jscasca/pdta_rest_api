@@ -27,6 +27,8 @@ import com.pd.api.entity.VerificationToken;
 import com.pd.api.entity.Work;
 import com.pd.api.entity.WorkRating;
 
+import com.pd.api.db.indexer.*;
+
 public class DataBaseBuilder {
 
     protected static String serverName = "localhost";
@@ -57,6 +59,9 @@ public class DataBaseBuilder {
         ac.addAnnotatedClass(VerificationToken.class);
         ac.addAnnotatedClass(Work.class);
         ac.addAnnotatedClass(WorkRating.class);
+        
+        ac.addAnnotatedClass(AuthorIndex.class);
+        ac.addAnnotatedClass(BookIndex.class);
         
         ac.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5InnoDBDialect");
         ac.setProperty("hibernate.connection.driver_class", "com.mysql.jdbc.Driver");

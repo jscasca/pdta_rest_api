@@ -10,13 +10,18 @@ import javax.persistence.Query;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import com.pd.api.db.indexer.AuthorIndex;
+import com.pd.api.db.indexer.BookIndex;
+import com.pd.api.entity.Author;
 import com.pd.api.entity.Book;
 import com.pd.api.entity.BookRating;
 import com.pd.api.entity.Language;
+import com.pd.api.entity.Posdta;
 import com.pd.api.entity.Role;
 import com.pd.api.entity.User;
 import com.pd.api.entity.VerificationToken;
 import com.pd.api.entity.aux.BookInfo;
+import com.pd.api.entity.aux.LibraryView;
 
 @Transactional
 public class DAO {
@@ -380,6 +385,36 @@ public class DAO {
         return rating;
     }
     
+    public static LibraryView getUserLibraryView(User user) { return getUserLibraryView(user.getId()); }
+    public static LibraryView getUserLibraryView(Long userId) {
+        LibraryView lv = new LibraryView();
+        List<Book> reading = getUserReading(userId, 0, LibraryView.DEFAULT_LIBRARY_VIEW_LIMIT);
+        List<Book> wishlisted = getUserWishlisted(userId, 0, LibraryView.DEFAULT_LIBRARY_VIEW_LIMIT);
+        List<Book> favorited = getUserFavorites(userId, 0, LibraryView.DEFAULT_LIBRARY_VIEW_LIMIT);
+        List<Posdta> posdtas = getUserPosdtas(userId, 0, LibraryView.DEFAULT_LIBRARY_VIEW_LIMIT);
+        lv.setReading(reading);
+        lv.setWishlisted(wishlisted);
+        lv.setFavorited(favorited);
+        lv.setPosdtas(posdtas);
+        return lv;
+    }
+    
+    public static List<Book> getUserFavorites(Long userId, int first, int limit) {
+        return getAllBooksFromQuery("select distinct bw.book from BookWishlisted bw where bw.user.id = ?", first, limit, userId);
+    }
+    
+    public static List<Book> getUserWishlisted(Long userId, int first, int limit) {
+        return getAllBooksFromQuery("select distinct bw.book from BookWishlisted bw where bw.user.id = ?", first, limit, userId);
+    }
+    
+    public static List<Book> getUserReading(Long userId, int first, int limit) {
+        return getAllBooksFromQuery("select distinct br.book from BookReading br where br.user.id = ?", first, limit, userId);
+    }
+    
+    public static List<Posdta> getUserPosdtas(Long userId, int first, int limit) {
+        return getAll(Posdta.class, "where user.id = ?", "", first, limit, userId);
+    }
+    
     //TODO: fix this method
     public static BookInfo getBookInfo(Book book) {
         return null;
@@ -391,5 +426,44 @@ public class DAO {
         BookRating rating = getBookRating(bookId);
         BookInfo info = new BookInfo(rating, book);
         return info;
+    }
+    
+    public static BookIndex getLastBookIndex() {
+        return getUnique(BookIndex.class, "ORDER BY id DESC limit 1");
+    }
+    
+    //getAllBooksFromQuery("select distinct bw.book from BookWishlisted bw where bw.user.id = ?", first, limit, userId);
+    //getAllBooksFromQuery(String query, int first, int limit, Object... params)
+    public static List<Book> newBooksToIndex(BookIndex index) { return newBooksToIndex(index, 1000);}
+    public static List<Book> newBooksToIndex(BookIndex index, int limit) {
+        return getAllBooksFromQuery("select b from Book b where b.id > ?", 0, limit, index.getLastIndexed());
+    }
+    
+    public static List<Book> getBooksSinceLastIndex() {return getBooksSinceLastIndex(1000);}
+    public static List<Book> getBooksSinceLastIndex(int limit) {
+        BookIndex index = getLastBookIndex();
+        if(index == null) {
+            index = new BookIndex(0L,0);
+        }
+        return newBooksToIndex(index, limit);
+    }
+    
+    public static AuthorIndex getLastAuthorIndex() {
+        return getUnique(AuthorIndex.class, "ORDER BY id DESC limit 1");
+    }
+    
+    //getAll(Class<T> type, String query, String orderBy, int first, int limit, Object... params)
+    public static List<Author> newAuthorsToIndex(AuthorIndex index) { return newAuthorsToIndex(index, 1000);}
+    public static List<Author> newAuthorsToIndex(AuthorIndex index, int limit) {
+        return getAll(Author.class, "where id > ?", "", 0, limit, index.getLastIndexed());
+    }
+    
+    public static List<Author> getAuthorsSinceLastIndex() {return getAuthorsSinceLastIndex(1000);}
+    public static List<Author> getAuthorsSinceLastIndex(int limit) {
+        AuthorIndex index = getLastAuthorIndex();
+        if(index == null) {
+            index = new AuthorIndex(0L,0);
+        }
+        return newAuthorsToIndex(index, limit);
     }
 }

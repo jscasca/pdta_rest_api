@@ -7,6 +7,7 @@ import com.pd.api.db.DAO;
 import com.pd.api.entity.Credential;
 import com.pd.api.entity.Role;
 import com.pd.api.entity.User;
+import com.pd.api.entity.aux.LibraryView;
 import com.pd.api.entity.aux.LoggedInWrapper;
 import com.pd.api.exception.GeneralException;
 
@@ -21,5 +22,12 @@ public class MyServiceImplementation {
     public static LoggedInWrapper logIn(String username) {
         Credential credential = DAO.getUniqueByUsername(Credential.class, username);
         return new LoggedInWrapper(credential);
+    }
+    
+    //TODO: allow the limit to be passed as a parameter
+    public static LibraryView getUserLibraryView(String username) {
+        User user = DAO.getUserByUsername(username);
+        LibraryView lv = DAO.getUserLibraryView(user);
+        return lv;
     }
 }

@@ -17,6 +17,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.pd.api.entity.Book;
 import com.pd.api.entity.Posdta;
 import com.pd.api.entity.User;
+import com.pd.api.entity.aux.LibraryView;
 import com.pd.api.entity.aux.UserInfo;
 import com.pd.api.entity.aux.UserToUser;
 import com.pd.api.security.CustomUserData;
@@ -46,6 +47,13 @@ public class UserService {
     public UserInfo getUserInfo(@PathVariable("id") final Long id,
             final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
         return UserServiceImplementation.getUserInfo(id);
+    }
+
+    @RequestMapping(value = "/{id:[0-9]+}/libraryView", method = RequestMethod.GET)
+    @ResponseBody
+    public LibraryView getUserLibraryView(@PathVariable("id") final Long id,
+            final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
+        return UserServiceImplementation.getUserLibraryView(id);
     }
     
     @Secured("ROLE_USER")

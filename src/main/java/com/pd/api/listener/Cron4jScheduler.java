@@ -8,6 +8,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import com.pd.api.db.indexer.LuceneCronIndexer;
 import com.pd.api.util.LuceneIndexer;
 
 public class Cron4jScheduler implements ServletContextListener {
@@ -31,19 +32,14 @@ public class Cron4jScheduler implements ServletContextListener {
         // 2.a If needed, register a custom task collector
         //TaskCollector collector = new TaskCollector()/*or MyTaskCollector()*/
         //scheduler.addTaskCollector(collector);
-        // 2.b Create a simple runnable task @@ */5 * * * * @@
-        scheduler.schedule("* * * * *", new Runnable() {
+        // 2.b Create a simple runnable task @@ */5 * * * * @@ -> run every 5 minutes
+        scheduler.schedule("*/10 * * * *", new Runnable() {
             public void run() {
                 System.out.println("Runing the indexer");
                 //Run the indexing
                 long startTime = System.nanoTime();
-                /*try {
-                    LuceneIndexer indexer = LuceneIndexer.getInstance();
-                    indexer.index();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }*/
+                LuceneCronIndexer indexer = new LuceneCronIndexer();
+                indexer.index();
                 long endTime = System.nanoTime();
                 System.out.println("Indexing took [" + (endTime - startTime)/1000000 + "] miliseconds");
             }

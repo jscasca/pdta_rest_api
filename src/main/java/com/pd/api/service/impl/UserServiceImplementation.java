@@ -9,6 +9,7 @@ import com.pd.api.db.DAO;
 import com.pd.api.entity.Book;
 import com.pd.api.entity.Posdta;
 import com.pd.api.entity.User;
+import com.pd.api.entity.aux.LibraryView;
 import com.pd.api.entity.aux.UserInfo;
 import com.pd.api.entity.aux.UserToUser;
 import com.pd.api.exception.GeneralException;
@@ -26,8 +27,16 @@ public class UserServiceImplementation {
         return user;
     }
     
+    public static LibraryView getUserLibraryView(Long id) {
+        User user = DAO.get(User.class, id);
+        if(user == null) throw new GeneralException("User not found");
+        return DAO.getUserLibraryView(id);
+    }
+    
     public static UserInfo getUserInfo(Long id) {
         User user = DAO.get(User.class, id);
+        if(user == null) throw new GeneralException("User not found");
+        
         List<Book> favorites = getUserFavorites(id, 0, UserInfo.DEFAULT_LIMIT);
         List<Book> wishlisted = getUserWishlisted(id, 0, UserInfo.DEFAULT_LIMIT);
         List<Book> reading = getUserReading(id, 0, UserInfo.DEFAULT_LIMIT);

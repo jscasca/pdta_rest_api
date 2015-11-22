@@ -26,40 +26,20 @@ import com.pd.api.security.CustomUserData;
 import com.pd.api.service.impl.MyServiceImplementation;
 
 @Controller
-@RequestMapping(value = "/api/me")
-@Secured({"ROLE_USER","ROLE_ADMIN"})
-public class MyService extends AbstractService {
+@RequestMapping(value = "/api/health")
+public class HealthService extends AbstractService {
 
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
-    public MyService() {
+    public HealthService() {
         super();
     }
-
+    
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
-    public User findById(@ModelAttribute CustomUserData userData,
-            final Principal principal,
-            final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
-        
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        CustomUserData cu = loadUserFromSecurityContext();
-        String as = auth.toString();
-        return MyServiceImplementation.getMe(userData.getUsername());
-    }
-    
-    @RequestMapping(method = RequestMethod.GET, value="/logIn")
-    @ResponseBody
-    public LoggedInWrapper logMeIn(@ModelAttribute CustomUserData userData) {
-        return MyServiceImplementation.logIn(userData.getUsername());
-    }
-
-    //TODO: allow the limit t be passed as a parameter
-    @RequestMapping(method = RequestMethod.GET, value="/libraryView")
-    @ResponseBody
-    public LibraryView getMyLibrary(@ModelAttribute final CustomUserData userData) {
-        return MyServiceImplementation.getUserLibraryView(userData.getUsername());
+    public String getMyLibrary(@ModelAttribute final CustomUserData userData) {
+        return "OK";
     }
 
 }
