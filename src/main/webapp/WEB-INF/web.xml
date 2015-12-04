@@ -28,6 +28,11 @@
     </listener>
 
     <listener>
+        <display-name>Properties Loader Listener</display-name>
+        <listener-class>com.pd.api.listener.PropertiesLoader</listener-class>
+    </listener>
+
+    <listener>
         <display-name>cron4j scheduler manager</display-name>
         <listener-class>com.pd.api.listener.Cron4jScheduler</listener-class>
     </listener>

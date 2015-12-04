@@ -13,3 +13,4 @@ target/
 *~
 *.bak
 tmp/
+src/main/resources/config.properties

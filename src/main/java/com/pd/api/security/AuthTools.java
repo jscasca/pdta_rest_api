@@ -11,14 +11,11 @@ import com.pd.api.entity.VerificationToken;
 import com.pd.api.entity.VerificationToken.VerificationType;
 import com.pd.api.entity.aux.PasswordResetForm;
 import com.pd.api.exception.InvalidAuthenticationException;
-import com.pd.api.mail.Mailer;
-import com.pd.api.mail.GmailMailer;
+import com.pd.api.mail.MandrillMailer;
 
 public class AuthTools {
 
     private static PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-    
-    private static Mailer mailer = GmailMailer.getInstance();
     
     //Put here the email implementation
     
@@ -55,6 +52,7 @@ public class AuthTools {
         if(credential != null) {
             VerificationToken token = new VerificationToken(credential, VerificationType.PASSWORD_RESET, VerificationToken.DEFAULT_PASSWORD_RESET);
             token = DAO.put(token);
+            MandrillMailer mailer = new MandrillMailer();
             mailer.sendVerificationMail(token);
         }
     }
