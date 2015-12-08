@@ -1,7 +1,9 @@
 package com.pd.api.entity.aux;
 
+import com.pd.api.entity.Book;
 import com.pd.api.entity.BookReading;
 import com.pd.api.entity.Posdta;
+import com.pd.api.entity.User;
 
 public class PosdtaWrapper {
 
@@ -34,6 +36,10 @@ public class PosdtaWrapper {
     
     public Posdta getPosdta(BookReading reading) {
         return new Posdta(reading, posdta, rating);
+    }
+    
+    public Posdta getPosdta(User user, Book book) {
+        return new Posdta(user, book, posdta, rating);
     }
     
     @Override

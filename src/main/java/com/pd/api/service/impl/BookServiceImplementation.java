@@ -161,14 +161,19 @@ public class BookServiceImplementation {
     public static Posdta savePosdta(String username, Long bookId, PosdtaWrapper posdtaWrapper) {
         User user = DAO.getUserByUsername(username);
         Book book = DAO.get(Book.class, bookId);
-        BookReading reading = DAO.getUnique(BookReading.class, "where user = ? and book = ?", user, book);
-        if(reading == null) throw new InvalidStateException("You have to start reading this book first"); //Not reading
-        //Check if there was another posdta
-        Posdta posdta = DAO.getUnique(Posdta.class, "where user = ? and book = ? ", user, book);
+        
+        Posdta posdta = DAO.getUnique(Posdta.class, "where user = ? and book = ? ", user, book); //Check if there was a Posdta already
         if(posdta != null) throw new InvalidStateException("There is already a Posdta for this book"); //Duplicate posdta 
-        posdta = posdtaWrapper.getPosdta(reading);
+        
+        BookReading reading = DAO.getUnique(BookReading.class, "where user = ? and book = ?", user, book);
+        if(reading != null) {
+            posdta = posdtaWrapper.getPosdta(reading);
+        } else {
+            posdta = posdtaWrapper.getPosdta(user, book);
+        }
+        
         DAO.put(posdta);
-        //update rating
+        
         WorkRating wr = DAO.getUnique(WorkRating.class, "where work = ?", book.getWork());
         if(wr == null) wr = new WorkRating(book.getWork());
         wr.updateCounter(posdtaWrapper.getRating());
@@ -176,10 +181,18 @@ public class BookServiceImplementation {
         Work work = book.getWork();
         work.updateRating(wr);
         DAO.put(work);
-        DAO.remove(reading.getClass(), reading.getId());
+        
         BookRating rating = book.getRating();
         rating.addRating(posdta.getRating());
-        rating.removeReading();
+        if(reading != null) {
+            rating.removeReading();
+            DAO.remove(reading.getClass(), reading.getId());
+        }
+        BookWishlisted wishlisted = DAO.getUnique(BookWishlisted.class, "where user = ? and book = ?", user, book);
+        if(wishlisted != null) {
+            rating.removeWishlisted();
+            DAO.remove(wishlisted.getClass(), wishlisted.getId());
+        }
         DAO.put(rating);
         return posdta;
     }

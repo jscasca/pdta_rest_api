@@ -33,7 +33,7 @@ public class Posdta {
     private Book book;
     
     @Type(type="timestamp")
-    private Date start;
+    private Date start = new Date();
     
     @Type(type="timestamp")
     private Date finish = new Date();
@@ -51,6 +51,13 @@ public class Posdta {
         this.work = work;
         this.book = book;
         this.start = start;
+        this.posdta = posdta;
+        this.rating = rating;
+    }
+    public Posdta(User user, Book book, String posdta, int rating) {
+        this.user = user;
+        this.work = book.getWork();
+        this.book = book;
         this.posdta = posdta;
         this.rating = rating;
     }

@@ -45,11 +45,11 @@ public class BookRating {
     }
     
     public void addReading() { reading++; }
-    public void removeReading() { reading--; }
+    public void removeReading() { reading--;if(reading<0)reading=0; }
     public void addWishlisted() { wishlisted++; }
-    public void removeWishlisted() { wishlisted--; }
+    public void removeWishlisted() { wishlisted--;if(wishlisted<0)wishlisted=0; }
     public void addFavorited() { favorited++;}
-    public void removeFavorited() { favorited--;}
+    public void removeFavorited() { favorited--;if(favorited<0)favorited=0;}
     public void addRating(int rating) {
         switch(rating) {
         case 1: rated1++;break;
