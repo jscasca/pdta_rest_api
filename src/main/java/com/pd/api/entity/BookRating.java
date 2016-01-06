@@ -25,6 +25,7 @@ public class BookRating {
     private int favorited;
     
     public BookRating() {}
+    public BookRating(Book book) {this(book.getId(), 0, 0, 0, 0, 0, 0, 0, 0);}
     public BookRating(Long bookId) {this(bookId, 0, 0, 0, 0, 0, 0, 0, 0);}
     public BookRating(Long bookId, int r1, int r2, int r3, int r4, int r5, int ring, int wish, int fav) {
         id = bookId;
@@ -58,6 +59,7 @@ public class BookRating {
         case 4: rated4++;break;
         case 5: rated5++;break;
         }
+        calculateRating();
     }
     
     public Long getBookId() { return id;}

@@ -43,6 +43,16 @@ public class BookServiceImplementation {
         return DAO.getAllBooksFromQuery("SELECT distinct p.book from Posdta p group by p.book.id order by count(*) desc", start, limit);
     }
     
+    public static List<Book> getTrendingBooks(int start, int limit) {
+        //TODO: fix this method
+        return DAO.getAllBooksFromQuery("SELECT distinct p.book from Posdta p group by p.book.id order by count(*) desc", start, limit);
+    }
+    
+    public static List<Book> getBooksWithTheSameAuthor(Long id, int start, int limit) {
+        Book b = DAO.get(Book.class, id);
+        return DAO.getAllBooksFromQuery("SELECT distinct b from Book b where b.work.author = ? and b.work <> ?", start, limit, b.getAuthor(), b.getWork());
+    }
+    
     public static Book getBookById(Long id) {
         return DAO.get(Book.class, id);
     }
@@ -126,7 +136,7 @@ public class BookServiceImplementation {
         DAO.put(reading);
         //Update book reading info
         BookRating rating = book.getRating();
-        rating.addReading();DAO.put(rating);
+        rating.addReading();DAO.put(book);
         //Check if it was wish listed and remove
         unwishlistBook(user, book);
     }
@@ -148,7 +158,7 @@ public class BookServiceImplementation {
         DAO.remove(reading.getClass(), reading.getId());
         BookRating rating = book.getRating();
         rating.removeReading();
-        DAO.put(rating);
+        DAO.put(book);
     }
     
     /**
@@ -193,7 +203,7 @@ public class BookServiceImplementation {
             rating.removeWishlisted();
             DAO.remove(wishlisted.getClass(), wishlisted.getId());
         }
-        DAO.put(rating);
+        DAO.put(book);
         return posdta;
     }
     
@@ -211,7 +221,7 @@ public class BookServiceImplementation {
         DAO.put(favorited);
         BookRating rating = book.getRating();
         rating.addFavorited();
-        DAO.put(rating);
+        DAO.put(book);
     }
     
     /**
@@ -227,7 +237,7 @@ public class BookServiceImplementation {
             DAO.delete(favorited);
             BookRating rating = book.getRating();
             rating.removeFavorited();
-            DAO.put(rating);
+            DAO.put(book);
         }
     }
     
@@ -264,7 +274,7 @@ public class BookServiceImplementation {
             DAO.delete(wishlisted);
             BookRating rating = book.getRating();
             rating.removeWishlisted();
-            DAO.put(rating);
+            DAO.put(book);
         }
     }
     
@@ -294,11 +304,13 @@ public class BookServiceImplementation {
         Author author = null;
         Language lang = DAO.getLanguageByCode(request.getLanguageString());
         if(lang == null) throw new InvalidParameterException("Invalid language");
+        String icon = request.getIcon();
+        String thumbnail = request.getThumbnail();
         if(request.hasNewAuthor()) {
             //Save the author and create the work
             author = new Author(request.getAuthorString());
             DAO.put(author);
-            work = new Work(author, request.getTitle(), lang);
+            work = new Work(author, request.getTitle(), icon, thumbnail, lang);
             DAO.put(work);
         } else {
             author = DAO.get(Author.class, request.getauthorId());
@@ -312,7 +324,7 @@ public class BookServiceImplementation {
                 if(work == null) throw new InvalidParameterException("The work does not exist");
             }
         }
-        book = new Book(work, request.getTitle(), lang);
+        book = new Book(work, request.getTitle(), icon, thumbnail, lang);
         book = DAO.put(book);
         //Create bookRequest
         NewBookRequest requestLog = new NewBookRequest(user, request.getTitle(), request.getAuthorString(), request.getLanguageString());

@@ -274,4 +274,12 @@ public class BookService {
         }
         return BookServiceImplementation.browseSuggestions(userData.getUsername(), first, limit);
     }
+
+    @RequestMapping(value="/{id:[0-9]+}/sameAuthor", method = RequestMethod.GET)
+    @ResponseBody
+    public List<Book> getBooksWithTheSameAuthor(@PathVariable("id") final Long bookId,
+            @RequestParam(value="start", defaultValue="0") final int start,
+            @RequestParam(value="limit", defaultValue="10") final int limit) {
+        return BookServiceImplementation.getBooksWithTheSameAuthor(bookId, start, limit);
+    }
 }

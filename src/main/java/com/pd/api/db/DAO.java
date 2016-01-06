@@ -423,7 +423,12 @@ public class DAO {
     //TODO: fix this method 
     public static BookInfo getBookInfo(Long bookId) {
         Book book = get(Book.class, bookId);
-        BookRating rating = getBookRating(bookId);
+        if(book.getRating() == null) {
+            BookRating rating = new BookRating(book);
+            book.setRating(rating);
+            put(book);
+        }
+        BookRating rating = book.getRating();
         BookInfo info = new BookInfo(rating, book);
         return info;
     }

@@ -74,7 +74,7 @@ public class WorkRating {
     
     public double getAverage() {
         int voters = countR1 + countR2 + countR3 + countR4 + countR5;
-        int points = countR1 * 1 + countR2 * 2 + countR3 * 4 + countR4 * 4 + countR5 * 5;
+        int points = (countR1 * 1) + (countR2 * 2) + (countR3 * 3) + (countR4 * 4) + (countR5 * 5);
         return ((double)points) / voters;
     }
 }
