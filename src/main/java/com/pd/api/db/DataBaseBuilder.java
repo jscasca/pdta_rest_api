@@ -16,17 +16,21 @@ import com.pd.api.entity.BookSuggestions;
 import com.pd.api.entity.BookWishlisted;
 import com.pd.api.entity.Credential;
 import com.pd.api.entity.EventWithBook;
+import com.pd.api.entity.EventWithPosdta;
 import com.pd.api.entity.EventWithUser;
 import com.pd.api.entity.Language;
 import com.pd.api.entity.NewBookRequest;
 import com.pd.api.entity.Posdta;
+import com.pd.api.entity.PosdtaVoting;
 import com.pd.api.entity.Role;
+import com.pd.api.entity.SocialProvider;
 import com.pd.api.entity.User;
 import com.pd.api.entity.UserBookInteraction;
+import com.pd.api.entity.UserVote;
 import com.pd.api.entity.VerificationToken;
 import com.pd.api.entity.Work;
 import com.pd.api.entity.WorkRating;
-
+import com.pd.api.security.SocialLogin;
 import com.pd.api.db.indexer.*;
 
 public class DataBaseBuilder {
@@ -50,15 +54,21 @@ public class DataBaseBuilder {
         ac.addAnnotatedClass(Event.class);
         ac.addAnnotatedClass(EventWithBook.class);
         ac.addAnnotatedClass(EventWithUser.class);
+        ac.addAnnotatedClass(EventWithPosdta.class);
         ac.addAnnotatedClass(Language.class);
         ac.addAnnotatedClass(NewBookRequest.class);
         ac.addAnnotatedClass(Posdta.class);
+        ac.addAnnotatedClass(PosdtaVoting.class);
         ac.addAnnotatedClass(Role.class);
         ac.addAnnotatedClass(User.class);
         ac.addAnnotatedClass(UserBookInteraction.class);
+        ac.addAnnotatedClass(UserVote.class);
         ac.addAnnotatedClass(VerificationToken.class);
         ac.addAnnotatedClass(Work.class);
         ac.addAnnotatedClass(WorkRating.class);
+        
+        ac.addAnnotatedClass(SocialProvider.class);
+        ac.addAnnotatedClass(SocialLogin.class);
         
         ac.addAnnotatedClass(AuthorIndex.class);
         ac.addAnnotatedClass(BookIndex.class);

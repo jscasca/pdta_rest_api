@@ -5,6 +5,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name="event_book")
@@ -15,9 +16,12 @@ public class EventWithBook extends Event {
     @JoinColumn(name="book_id")
     private Book book;
     
+    @Transient
+    private String className = "Book Event";
+    
     protected EventWithBook() {}
     
-    protected EventWithBook(User user, EventType type, Book book) {
+    public EventWithBook(User user, EventType type, Book book) {
         super(user, type);
         this.book = book;
     }

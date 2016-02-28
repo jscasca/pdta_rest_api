@@ -12,6 +12,9 @@ import com.pd.api.entity.BookRating;
 import com.pd.api.entity.BookReading;
 import com.pd.api.entity.BookSuggestions;
 import com.pd.api.entity.BookWishlisted;
+import com.pd.api.entity.Event;
+import com.pd.api.entity.EventWithBook;
+import com.pd.api.entity.EventWithPosdta;
 import com.pd.api.entity.Language;
 import com.pd.api.entity.NewBookRequest;
 import com.pd.api.entity.Posdta;
@@ -139,6 +142,8 @@ public class BookServiceImplementation {
         rating.addReading();DAO.put(book);
         //Check if it was wish listed and remove
         unwishlistBook(user, book);
+        EventWithBook startReadingEvent = new EventWithBook(user, Event.EventType.STARTED_READING, book);
+        DAO.put(startReadingEvent);
     }
     
     /**
@@ -204,6 +209,9 @@ public class BookServiceImplementation {
             DAO.remove(wishlisted.getClass(), wishlisted.getId());
         }
         DAO.put(book);
+        
+        EventWithPosdta posdtaEvent = new EventWithPosdta(user, Event.EventType.POSDTA, posdta);
+        DAO.put(posdtaEvent);
         return posdta;
     }
     
@@ -222,6 +230,8 @@ public class BookServiceImplementation {
         BookRating rating = book.getRating();
         rating.addFavorited();
         DAO.put(book);
+        EventWithBook favoriteEvent = new EventWithBook(user, Event.EventType.FAVORITED, book);
+        DAO.put(favoriteEvent);
     }
     
     /**
@@ -255,6 +265,8 @@ public class BookServiceImplementation {
         DAO.put(wishlisted);
         BookRating rating = book.getRating();
         rating.addWishlisted();
+        EventWithBook wishlistEvent = new EventWithBook(user, Event.EventType.WISHLISTED, book);
+        DAO.put(wishlistEvent);
     }
     
     /**

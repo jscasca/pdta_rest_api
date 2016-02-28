@@ -2,12 +2,15 @@ package com.pd.api.entity;
 
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Type;
@@ -42,6 +45,10 @@ public class Posdta {
     
     private int rating;
     
+    @OneToOne(cascade=CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private PosdtaVoting votes;
+    
     public Posdta() {}
     public Posdta(BookReading reading, String posdta, int rating) {
         this(reading.getUser(), reading.getWork(), reading.getBook(), reading.getCreationDate(), posdta, rating);
@@ -60,6 +67,10 @@ public class Posdta {
         this.book = book;
         this.posdta = posdta;
         this.rating = rating;
+    }
+    
+    public Long getId() {
+        return id;
     }
     
     public User getUser() {
@@ -84,6 +95,14 @@ public class Posdta {
     
     public int getRating() {
         return rating;
+    }
+    
+    public PosdtaVoting getVotes() {
+        return votes;
+    }
+    
+    public void setVotes(PosdtaVoting votes) {
+        this.votes = votes;
     }
     
     @Override

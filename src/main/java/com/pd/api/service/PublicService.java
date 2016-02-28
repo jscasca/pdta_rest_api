@@ -26,7 +26,10 @@ import com.pd.api.entity.CustomerDetails;
 import com.pd.api.entity.User;
 import com.pd.api.entity.aux.MemberRegistration;
 import com.pd.api.entity.aux.PasswordResetForm;
+import com.pd.api.entity.aux.SocialLoginForm;
+import com.pd.api.entity.aux.SocialRegistration;
 import com.pd.api.security.CustomUserData;
+import com.pd.api.service.impl.LoginServiceImplementation;
 import com.pd.api.service.impl.PublicServiceImplementation;
 import com.pd.api.exception.GeneralException;
 
@@ -65,6 +68,12 @@ public class PublicService {
     public User registerMember(@RequestBody MemberRegistration registration) {
         return PublicServiceImplementation.registerMember(registration);
     }
+    
+    @RequestMapping(value = "/socialRegistration/{provider}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public User registerSocialMember(@RequestBody SocialRegistration registration, @PathVariable("provider") final String provider) {
+        return PublicServiceImplementation.registerMemberSocialMedia(registration, provider);
+    } 
     
     @RequestMapping(value="/passwordRequest", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)

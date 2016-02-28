@@ -15,13 +15,16 @@ import com.pd.api.db.indexer.BookIndex;
 import com.pd.api.entity.Author;
 import com.pd.api.entity.Book;
 import com.pd.api.entity.BookRating;
+import com.pd.api.entity.Event;
 import com.pd.api.entity.Language;
 import com.pd.api.entity.Posdta;
 import com.pd.api.entity.Role;
+import com.pd.api.entity.SocialProvider;
 import com.pd.api.entity.User;
 import com.pd.api.entity.VerificationToken;
 import com.pd.api.entity.aux.BookInfo;
 import com.pd.api.entity.aux.LibraryView;
+import com.pd.api.security.SocialLogin;
 
 @Transactional
 public class DAO {
@@ -261,7 +264,7 @@ public class DAO {
      * @return
      */
     public static boolean usernameExists(String username) {
-        Query q = createQuery("Select c from Credential c where username = ?", username);
+        Query q = createQuery("Select u from User u where username = ?", username);
         return exists(q);
     }
     
@@ -470,5 +473,28 @@ public class DAO {
             index = new AuthorIndex(0L,0);
         }
         return newAuthorsToIndex(index, limit);
+    }
+    
+    public static SocialProvider saveProvider(String name) {
+        SocialProvider provider = new SocialProvider(name);
+        return put(provider);
+    }
+    
+    public static SocialProvider getProviderByName(String name) {
+        Query q = createQuery("SELECT obj FROM " + SocialProvider.class.getName() + " obj where name = ?", SocialProvider.providerNameToLowerCase(name));
+        try {
+            return (SocialProvider)q.getSingleResult();
+        } catch(Exception e) {
+            return null;
+        }
+    }
+    
+    public static SocialLogin getSocialLoginById(SocialProvider provider, String userId) {
+        Query q = createQuery("SELECT obj FROM " + SocialLogin.class.getName() + " obj where socialProvider = ? and providerUserId = ?", provider, userId);
+        try {
+            return (SocialLogin)q.getSingleResult();
+        } catch(Exception e) {
+            return null;
+        }
     }
 }

@@ -39,8 +39,10 @@ public class Event {
         STOPPED_READING,
         STARTED_FOLLOWING,
         STOPPED_FOLLOWING,
+        POSDTA,
         WISHLISTED,
         SUGGESTED,
+        FAVORITED,
         ADDED
     };
     
@@ -63,6 +65,7 @@ public class Event {
     //Event type
     protected Event(User user, EventType type) {
         this.user = user;
+        this.type = type;
     }
     
     public User getUser() {

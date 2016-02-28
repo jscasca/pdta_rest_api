@@ -132,7 +132,7 @@
         <oauth:client 
             client-id="webApp"
             secret="web123"
-            authorized-grant-types="password,refresh_token"
+            authorized-grant-types="password,refresh_token,authorization_code,implicit"
             authorities="ROLE_WEB"
             access-token-validity="120000"
             refresh-token-validity="1200000"

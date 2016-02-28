@@ -1,11 +1,15 @@
 package com.pd.api.security;
 
+import java.util.Set;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 
 import com.pd.api.db.DAO;
 import com.pd.api.entity.Credential;
+import com.pd.api.entity.Role;
+import com.pd.api.entity.SocialProvider;
 import com.pd.api.entity.User;
 import com.pd.api.entity.VerificationToken;
 import com.pd.api.entity.VerificationToken.VerificationType;
@@ -35,6 +39,15 @@ public class AuthTools {
             throw new InvalidAuthenticationException("Not auhtenticable");
         }
         return credential;
+    }
+    
+    public static SocialLogin authenticateSocialLogin(String authentication, String token) {
+        String[] a = authentication.split(":");
+        String providerString = a[0];
+        String user = a[1];
+        SocialProvider provider = DAO.getProviderByName(providerString);
+        SocialLogin login = DAO.getSocialLoginById(provider, user);
+        return login;
     }
     
     private static Credential getCredentialFromAuthentication(String authentication) {
@@ -70,8 +83,12 @@ public class AuthTools {
         //And rmeove the used token
     }
     
-    public static Credential register(User user, String email, String password) {
+    public static Credential registerCredential(User user, String email, String password) {
         return new Credential(user, email, passwordEncoder.encode(password));
+    }
+    
+    public static SocialLogin registerSocial(User user, SocialProvider provider, String token, String id, Set<Role> roles) {
+        return new SocialLogin(user, provider, id, token, roles);
     }
     
     public static String encode(String plain) {

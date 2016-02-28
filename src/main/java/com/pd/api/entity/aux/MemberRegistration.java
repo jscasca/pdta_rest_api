@@ -48,6 +48,6 @@ public class MemberRegistration {
     }
     
     public Credential getCredentialFromRegistrationForm(User user) {
-        return AuthTools.register(user, email, password);
+        return AuthTools.registerCredential(user, email, password);
     }
 }

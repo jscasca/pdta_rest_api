@@ -7,6 +7,8 @@ import javax.persistence.Query;
 
 import com.pd.api.db.DAO;
 import com.pd.api.entity.Book;
+import com.pd.api.entity.Event;
+import com.pd.api.entity.EventWithUser;
 import com.pd.api.entity.Posdta;
 import com.pd.api.entity.User;
 import com.pd.api.entity.aux.LibraryView;
@@ -60,6 +62,9 @@ public class UserServiceImplementation {
         User following = DAO.getUserById(id);
         user.addFollowee(following);
         DAO.put(user);
+        //Create event
+        EventWithUser followEvent = new EventWithUser(user, Event.EventType.STARTED_FOLLOWING, following);
+        DAO.put(followEvent);
         return following;
     }
     

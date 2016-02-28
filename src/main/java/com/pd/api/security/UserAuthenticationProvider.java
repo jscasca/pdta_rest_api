@@ -35,11 +35,22 @@ public class UserAuthenticationProvider implements AuthenticationProvider {
         String username = authentication.getPrincipal() != null ? authentication.getPrincipal().toString() : null;
         String password = authentication.getCredentials() != null ? authentication.getCredentials().toString() : null;
         try {
-            Credential credential = AuthTools.authenticate(username, password);
-            final Collection<SecurityRole> grantedAuths = SecurityRole.getCredentialRoles(credential);
+            final Collection<SecurityRole> grantedAuths;
+            Object tokenDetails;
+            if(SocialLogin.isSocialCredential(username)) {
+                //Authenticate by social
+                SocialLogin login = AuthTools.authenticateSocialLogin(username, password);
+                grantedAuths = SecurityRole.getSocialLoginRoles(login);
+                tokenDetails = login;
+            } else {
+                //Authenticate by cred
+                Credential credential = AuthTools.authenticate(username, password);
+                grantedAuths = SecurityRole.getCredentialRoles(credential);
+                tokenDetails = credential;
+            }
             final UserDetails principal = new User(username, password, grantedAuths);
             final UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(principal, password, grantedAuths);
-            token.setDetails(credential);
+            token.setDetails(tokenDetails);
             return token;
         } catch(Exception e) {
             throw new OAuth2Exception(e.getMessage(), e);

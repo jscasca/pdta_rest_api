@@ -41,5 +41,13 @@ public class SecurityRole implements GrantedAuthority {
         }
         return roles;
     }
+    
+    public static Collection<SecurityRole> getSocialLoginRoles(SocialLogin login) {
+        Collection<SecurityRole> roles = new ArrayList<SecurityRole>();
+        for(Role role : login.getRoles()) {
+            roles.add(new SecurityRole(role.getAuthority()));
+        }
+        return roles;
+    }
 
 }

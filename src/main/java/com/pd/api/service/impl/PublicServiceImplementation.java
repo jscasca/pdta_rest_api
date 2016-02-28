@@ -1,13 +1,21 @@
 package com.pd.api.service.impl;
 
+import java.util.Set;
+
+import com.google.common.collect.Sets;
 import com.pd.api.db.DAO;
 import com.pd.api.entity.Credential;
+import com.pd.api.entity.Role;
+import com.pd.api.entity.SocialProvider;
 import com.pd.api.entity.User;
 import com.pd.api.entity.aux.MemberRegistration;
 import com.pd.api.entity.aux.PasswordResetForm;
+import com.pd.api.entity.aux.SocialRegistration;
 import com.pd.api.exception.DuplicateResourceException;
 import com.pd.api.exception.GeneralException;
 import com.pd.api.security.AuthTools;
+import com.pd.api.security.AuthenticatedUserToken;
+import com.pd.api.security.SocialLogin;
 
 public class PublicServiceImplementation {
 
@@ -29,6 +37,31 @@ public class PublicServiceImplementation {
         AuthTools.resetPassword(prf);
     }
     
+    public static User registerMemberSocialMedia(SocialRegistration registration, String providerId) {
+        //Check if name is available
+        if(DAO.usernameExists(registration.getUsername()))throw new DuplicateResourceException("User already exists");
+        //Check if the social login has not been used
+        SocialProvider provider = DAO.getProviderByName(providerId);
+        if(provider == null) {
+            throw new GeneralException("The provider is not supported yet");
+        }
+        
+        SocialLogin login = DAO.getSocialLoginById(provider, registration.getUserId());
+        if(login != null) {
+            throw new DuplicateResourceException("Login already exists for that user");
+        }
+        
+        //TODO check if the token is valid by calling the social api
+        User newUser = registration.getUserFromRegistrationForm();
+        //TODO: some weird shit to select roles from here
+        Set<Role> roles = Sets.newHashSet(DAO.getMemberRole());
+        login = registration.getLoginFromRegistrationForm(newUser, provider, roles);
+        newUser = DAO.put(newUser);
+        if(newUser == null) throw new GeneralException("The user could not be created");
+        DAO.put(login);
+        return newUser;
+    }
+    
     public static User registerMember(MemberRegistration registration) {
         //TODO Change for coherent exceptions
         //if(!com.pd.api.db.DAO.nameAvailable(registration.getUserName()))throw new DuplicateResourceException("User already exists");
@@ -38,9 +71,9 @@ public class PublicServiceImplementation {
         
         User newUser = registration.getUserFromRegistrationForm();
         Credential credential = registration.getCredentialFromRegistrationForm(newUser);
-        DAO.put(newUser);
-        DAO.put(credential);
+        newUser = DAO.put(newUser);
         if(newUser == null) throw new GeneralException("The user could not be created");
+        DAO.put(credential);
         return newUser;
     }
     
