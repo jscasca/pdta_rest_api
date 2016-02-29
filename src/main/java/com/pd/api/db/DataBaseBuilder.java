@@ -26,6 +26,7 @@ import com.pd.api.entity.Role;
 import com.pd.api.entity.SocialProvider;
 import com.pd.api.entity.User;
 import com.pd.api.entity.UserBookInteraction;
+import com.pd.api.entity.UserRecommendations;
 import com.pd.api.entity.UserVote;
 import com.pd.api.entity.VerificationToken;
 import com.pd.api.entity.Work;
@@ -66,6 +67,8 @@ public class DataBaseBuilder {
         ac.addAnnotatedClass(VerificationToken.class);
         ac.addAnnotatedClass(Work.class);
         ac.addAnnotatedClass(WorkRating.class);
+        
+        ac.addAnnotatedClass(UserRecommendations.class);
         
         ac.addAnnotatedClass(SocialProvider.class);
         ac.addAnnotatedClass(SocialLogin.class);

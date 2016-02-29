@@ -81,6 +81,10 @@ public class Posdta {
         return book;
     }
     
+    public Work getWork() {
+        return work;
+    }
+    
     public Date getStart() {
         return start;
     }
