@@ -51,6 +51,18 @@ public class MyServiceImplementation {
         return lv;
     }
     
+    public static void updateMyDisplayName(String username, String displayName) {
+        User user = DAO.getUserByUsername(username);
+        user.setDisplayName(displayName);
+        DAO.put(user);
+    }
+    
+    public static void updateMyProfilePic(String username, String profilePic) {
+        User user = DAO.getUserByUsername(username);
+        user.setIcon(profilePic);
+        DAO.put(user);
+    }
+    
     public static List<Book> getUserRecommendations(String username, int start, int limit) {
         User user = DAO.getUserByUsername(username);
         UserRecommendations recommendations = DAO.get(UserRecommendations.class, user.getId());
@@ -107,6 +119,5 @@ public class MyServiceImplementation {
                 DAO.put(recommendations);
             }
         }
-        
     }
 }

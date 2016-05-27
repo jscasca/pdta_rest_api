@@ -9,7 +9,8 @@ import com.pd.api.entity.Posdta;
 
 public class LibraryView {
     
-    public static final int DEFAULT_LIBRARY_VIEW_LIMIT = 10;
+    public static final int DEFAULT_LIBRARY_VIEW_LIMIT = 3;
+    public static final int DEFAULT_POSDTA_VIEW_LIMIT = 6;
     
     private List<Book> reading = new ArrayList<Book>();
     private List<Book> wishlisted = new ArrayList<Book>();

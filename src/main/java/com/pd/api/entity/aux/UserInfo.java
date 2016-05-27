@@ -10,7 +10,8 @@ import com.pd.api.entity.User;
 
 public class UserInfo {
     
-    public static final int DEFAULT_LIMIT = 10;
+    public static final int DEFAULT_LIMIT = 3;
+    public static final int DEFAULT_POSDTA_LIMIT = 10;
     
     private User user;
     private List<Book> reading = new ArrayList<Book>();

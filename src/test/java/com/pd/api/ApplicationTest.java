@@ -14,6 +14,7 @@ import com.pd.api.entity.Work;
 import com.pd.api.entity.aux.MemberRegistration;
 import com.pd.api.exception.DuplicateResourceException;
 import com.pd.api.security.SocialLogin;
+import com.pd.api.security.SocialLoginUsername;
 import com.pd.api.service.impl.BookServiceImplementation;
 import com.pd.api.service.impl.SearchServiceImplementation;
 import com.pd.api.util.LuceneIndexer;
@@ -35,14 +36,25 @@ public class ApplicationTest {
         //testSearch();
         //testMostRead();
         //testSuggestions();
+        /*
         SocialProvider provider = DAO.getProviderByName("facebook");
         
         Query q = DAO.createQuery("SELECT obj FROM " + SocialLogin.class.getName() + " obj where socialProvider = ?", provider);
         List<SocialLogin> logins = q.getResultList();
         for(SocialLogin l : logins) {
             System.out.println(l.getUserId());
+        }*/
+        User u = testSocialUsername(new SocialLoginUsername("facebook:10156563121645300"));
+        System.out.println(u);
+    }
+    
+    public static User testSocialUsername(SocialLoginUsername username) {
+        Query q = DAO.createQuery("Select obj.user from SocialLogin obj where obj.providerUserId = ? and obj.socialProvider.name = ?", username.getId(), username.getProvider());
+        try {
+            return (User)q.getSingleResult();
+        } catch (Exception e) {
+            return null;
         }
-        
     }
     
     public static void getProviders() {

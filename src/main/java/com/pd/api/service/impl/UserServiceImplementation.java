@@ -39,10 +39,10 @@ public class UserServiceImplementation {
         User user = DAO.get(User.class, id);
         if(user == null) throw new GeneralException("User not found");
         
-        List<Book> favorites = getUserFavorites(id, 0, UserInfo.DEFAULT_LIMIT);
-        List<Book> wishlisted = getUserWishlisted(id, 0, UserInfo.DEFAULT_LIMIT);
-        List<Book> reading = getUserReading(id, 0, UserInfo.DEFAULT_LIMIT);
-        List<Posdta> posdtas = getUserPosdtas(id, 0, UserInfo.DEFAULT_LIMIT);
+        List<Book> favorites = DAO.getUserFavorites(id, 0, UserInfo.DEFAULT_LIMIT);
+        List<Book> wishlisted = DAO.getUserWishlisted(id, 0, UserInfo.DEFAULT_LIMIT);
+        List<Book> reading = DAO.getUserReading(id, 0, UserInfo.DEFAULT_LIMIT);
+        List<Posdta> posdtas = DAO.getUserPosdtas(id, 0, UserInfo.DEFAULT_POSDTA_LIMIT);
         //List<User> followers = getUserFollowers(id, 0, UserInfo.DEFAULT_LIMIT);
         //List<User> following = getUsersFollowing(id, 0, UserInfo.DEFAULT_LIMIT);
         int followerCount = getUserFollowerCount(id);
@@ -61,7 +61,7 @@ public class UserServiceImplementation {
         User user = DAO.getUserByUsername(username);
         User following = DAO.getUserById(id);
         user.addFollowee(following);
-        DAO.put(user);
+        user = DAO.put(user);
         //Create event
         EventWithUser followEvent = new EventWithUser(user, Event.EventType.STARTED_FOLLOWING, following);
         DAO.put(followEvent);
@@ -113,18 +113,18 @@ public class UserServiceImplementation {
     }
     
     public static List<Book> getUserFavorites(Long userId, int first, int limit) {
-        return DAO.getAllBooksFromQuery("select distinct bw.book from BookWishlisted bw where bw.user.id = ?", first, limit, userId);
+        return DAO.getUserFavorites(userId, first, limit);
     }
     
     public static List<Book> getUserWishlisted(Long userId, int first, int limit) {
-        return DAO.getAllBooksFromQuery("select distinct bw.book from BookWishlisted bw where bw.user.id = ?", first, limit, userId);
+        return DAO.getUserWishlisted(userId, first, limit);
     }
     
     public static List<Book> getUserReading(Long userId, int first, int limit) {
-        return DAO.getAllBooksFromQuery("select distinct br.book from BookReading br where br.user.id = ?", first, limit, userId);
+        return DAO.getUserReading(userId, first, limit);
     }
     
     public static List<Posdta> getUserPosdtas(Long userId, int first, int limit) {
-        return DAO.getAll(Posdta.class, "where user.id = ?", "", first, limit, userId);
+        return DAO.getUserPosdtas(userId, first, limit);
     }
 }

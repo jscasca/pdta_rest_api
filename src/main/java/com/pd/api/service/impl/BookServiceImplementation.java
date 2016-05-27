@@ -136,10 +136,11 @@ public class BookServiceImplementation {
         BookReading reading = DAO.getUnique(BookReading.class, "where user = ? and book = ?", user, book);
         if(reading != null) return;
         reading = new BookReading(user, book);
-        DAO.put(reading);
+        reading = DAO.put(reading);
         //Update book reading info
         BookRating rating = book.getRating();
-        rating.addReading();DAO.put(book);
+        rating.addReading();
+        book = DAO.put(book);
         //Check if it was wish listed and remove
         unwishlistBook(user, book);
         EventWithBook startReadingEvent = new EventWithBook(user, Event.EventType.STARTED_READING, book);
@@ -157,8 +158,11 @@ public class BookServiceImplementation {
         Book book = DAO.get(Book.class, bookId);
         BookReading reading = DAO.getUnique(BookReading.class, "where user = ? and book = ?", user, book);
         if(reading == null) throw new InvalidStateException("You have to start reading this book first");
+        /*
+        TODO: check wether users can stop reading without leaving a posdta
         Posdta posdta = DAO.getUnique(Posdta.class, "where user = ? and book = ? ", user, book);
         if(posdta == null) throw new InvalidStateException("You have to write a Posdta of this book");
+        */
         //TODO: implement the event now delete the reading
         DAO.remove(reading.getClass(), reading.getId());
         BookRating rating = book.getRating();
@@ -187,15 +191,15 @@ public class BookServiceImplementation {
             posdta = posdtaWrapper.getPosdta(user, book);
         }
         
-        DAO.put(posdta);
+        posdta = DAO.put(posdta);
         
         WorkRating wr = DAO.getUnique(WorkRating.class, "where work = ?", book.getWork());
         if(wr == null) wr = new WorkRating(book.getWork());
         wr.updateCounter(posdtaWrapper.getRating());
-        DAO.put(wr);
+        wr = DAO.put(wr);
         Work work = book.getWork();
         work.updateRating(wr);
-        DAO.put(work);
+        work = DAO.put(work);
         
         BookRating rating = book.getRating();
         rating.addRating(posdta.getRating());
@@ -208,7 +212,7 @@ public class BookServiceImplementation {
             rating.removeWishlisted();
             DAO.remove(wishlisted.getClass(), wishlisted.getId());
         }
-        DAO.put(book);
+        book = DAO.put(book);
         
         EventWithPosdta posdtaEvent = new EventWithPosdta(user, Event.EventType.POSDTA, posdta);
         DAO.put(posdtaEvent);
@@ -226,12 +230,12 @@ public class BookServiceImplementation {
         BookFavorited favorited = DAO.getUnique(BookFavorited.class, "where user = ? and book = ? ", user, book);
         if(favorited != null) return;
         favorited = new BookFavorited(user, book);
-        DAO.put(favorited);
+        favorited = DAO.put(favorited);
         BookRating rating = book.getRating();
         rating.addFavorited();
-        DAO.put(book);
+        book = DAO.put(book);
         EventWithBook favoriteEvent = new EventWithBook(user, Event.EventType.FAVORITED, book);
-        DAO.put(favoriteEvent);
+        favoriteEvent = DAO.put(favoriteEvent);
     }
     
     /**
@@ -247,7 +251,7 @@ public class BookServiceImplementation {
             DAO.delete(favorited);
             BookRating rating = book.getRating();
             rating.removeFavorited();
-            DAO.put(book);
+            book = DAO.put(book);
         }
     }
     
@@ -262,11 +266,11 @@ public class BookServiceImplementation {
         BookWishlisted wishlisted = DAO.getUnique(BookWishlisted.class, "where user = ? and book = ? ", user, book);
         if(wishlisted != null)return;
         wishlisted = new BookWishlisted(user, book);
-        DAO.put(wishlisted);
+        wishlisted = DAO.put(wishlisted);
         BookRating rating = book.getRating();
         rating.addWishlisted();
         EventWithBook wishlistEvent = new EventWithBook(user, Event.EventType.WISHLISTED, book);
-        DAO.put(wishlistEvent);
+        wishlistEvent = DAO.put(wishlistEvent);
     }
     
     /**
@@ -286,7 +290,7 @@ public class BookServiceImplementation {
             DAO.delete(wishlisted);
             BookRating rating = book.getRating();
             rating.removeWishlisted();
-            DAO.put(book);
+            book = DAO.put(book);
         }
     }
     
@@ -321,16 +325,16 @@ public class BookServiceImplementation {
         if(request.hasNewAuthor()) {
             //Save the author and create the work
             author = new Author(request.getAuthorString());
-            DAO.put(author);
+            author = DAO.put(author);
             work = new Work(author, request.getTitle(), icon, thumbnail, lang);
-            DAO.put(work);
+            work = DAO.put(work);
         } else {
             author = DAO.get(Author.class, request.getauthorId());
             if(author == null) throw new InvalidParameterException("The author does not exist");
             //Check if the work exists
             if(request.hasNewWork()) {
                 work = new Work(author, request.getTitle(), lang);
-                DAO.put(work);
+                work = DAO.put(work);
             } else {
                 work = DAO.get(Work.class, request.getWorkId());
                 if(work == null) throw new InvalidParameterException("The work does not exist");

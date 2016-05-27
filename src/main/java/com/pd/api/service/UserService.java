@@ -157,21 +157,4 @@ public class UserService {
             final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
         return UserServiceImplementation.getUserReading(userId, first, limit);
     }
-    
-    @RequestMapping(value = "/{id:[0-9]+}/recommendations", method = RequestMethod.GET)
-    @ResponseBody
-    public void calculateUserRecommendations() {
-        //not sure this should be called from out here but we will leave the holder
-    }
-    
-    @RequestMapping(value = "/{id:[0-9]+}/recommendations", method = RequestMethod.GET)
-    @ResponseBody
-    public List<Book> getUserRecommendations(@PathVariable("id") final Long userId,
-            @RequestParam(value="start", defaultValue="0") int first,
-            @RequestParam(value="limit", defaultValue="10") int limit,
-            final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
-        return null;
-    }
-    
-    //get user ...
 }

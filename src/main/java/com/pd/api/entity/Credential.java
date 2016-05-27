@@ -56,7 +56,7 @@ public class Credential implements Serializable {
         inverseJoinColumns = {@JoinColumn(name = "role_id")})
     private Set<Role> roles;
     
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.ALL})
     private User user;
     
     public Credential(){}

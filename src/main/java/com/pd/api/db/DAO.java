@@ -25,6 +25,7 @@ import com.pd.api.entity.VerificationToken;
 import com.pd.api.entity.aux.BookInfo;
 import com.pd.api.entity.aux.LibraryView;
 import com.pd.api.security.SocialLogin;
+import com.pd.api.security.SocialLoginUsername;
 
 @Transactional
 public class DAO {
@@ -75,6 +76,46 @@ public class DAO {
     
     public static <T> T put(T obj, boolean merge) {
         EntityManager em = getEM();
+        EntityTransaction tx = em.getTransaction();
+        if(tx.isActive()) {
+            return em.merge(obj);
+        } else {
+            tx.begin();
+            Object o = em.merge(obj);
+            tx.commit();
+            return (T) o;
+        }
+    }
+    
+    
+    /**
+    MyEntity e = new MyEntity();
+
+// scenario 1
+// tran starts
+em.persist(e); 
+e.setSomeField(someValue); 
+// tran ends, and the row for someField is updated in the database
+
+// scenario 2
+// tran starts
+e = new MyEntity();
+em.merge(e);
+e.setSomeField(anotherValue); 
+// tran ends but the row for someField is not updated in the database
+// (you made the changes *after* merging)
+
+// scenario 3
+// tran starts
+e = new MyEntity();
+MyEntity e2 = em.merge(e);
+e2.setSomeField(anotherValue); 
+// tran ends and the row for someField is updated
+// (the changes were made to e2, not e)
+    */
+    
+    /*public static <T> T put(T obj, boolean merge) {
+        EntityManager em = getEM();
         em.getTransaction().begin();
         if (merge) {
             obj = em.merge(obj);
@@ -83,7 +124,7 @@ public class DAO {
         em.flush();
         em.getTransaction().commit();
         return obj;
-    }
+    }*/
     
     public static <T> T merge(T obj) {
         EntityManager em = getEM();
@@ -343,7 +384,19 @@ public class DAO {
         }
     }
     
+    public static User getUserBySocialLogin(SocialLoginUsername username) {
+        Query q = createQuery("Select obj.user from SocialLogin obj where obj.providerUserId = ? and obj.socialProvider.name = ?", username.getId(), username.getProvider());
+        try {
+            return (User)q.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    
     public static User getUserByUsername(String username) {
+        if(SocialLogin.isSocialCredential(username)) {
+            return getUserBySocialLogin(new SocialLoginUsername(username));
+        }
         return getUniqueByUsername(User.class, username);
     }
     
@@ -394,7 +447,7 @@ public class DAO {
         List<Book> reading = getUserReading(userId, 0, LibraryView.DEFAULT_LIBRARY_VIEW_LIMIT);
         List<Book> wishlisted = getUserWishlisted(userId, 0, LibraryView.DEFAULT_LIBRARY_VIEW_LIMIT);
         List<Book> favorited = getUserFavorites(userId, 0, LibraryView.DEFAULT_LIBRARY_VIEW_LIMIT);
-        List<Posdta> posdtas = getUserPosdtas(userId, 0, LibraryView.DEFAULT_LIBRARY_VIEW_LIMIT);
+        List<Posdta> posdtas = getUserPosdtas(userId, 0, LibraryView.DEFAULT_POSDTA_VIEW_LIMIT);
         lv.setReading(reading);
         lv.setWishlisted(wishlisted);
         lv.setFavorited(favorited);
@@ -403,7 +456,7 @@ public class DAO {
     }
     
     public static List<Book> getUserFavorites(Long userId, int first, int limit) {
-        return getAllBooksFromQuery("select distinct bw.book from BookWishlisted bw where bw.user.id = ?", first, limit, userId);
+        return getAllBooksFromQuery("select distinct bw.book from BookFavorited bw where bw.user.id = ?", first, limit, userId);
     }
     
     public static List<Book> getUserWishlisted(Long userId, int first, int limit) {
@@ -429,7 +482,7 @@ public class DAO {
         if(book.getRating() == null) {
             BookRating rating = new BookRating(book);
             book.setRating(rating);
-            put(book);
+            book = put(book);
         }
         BookRating rating = book.getRating();
         BookInfo info = new BookInfo(rating, book);

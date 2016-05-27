@@ -33,7 +33,7 @@ public class Cron4jScheduler implements ServletContextListener {
         //TaskCollector collector = new TaskCollector()/*or MyTaskCollector()*/
         //scheduler.addTaskCollector(collector);
         // 2.b Create a simple runnable task @@ */5 * * * * @@ -> run every 5 minutes
-        scheduler.schedule("*/10 * * * *", new Runnable() {
+        scheduler.schedule("*/1 * * * *", new Runnable() {
             public void run() {
                 System.out.println("Runing the indexer");
                 //Run the indexing

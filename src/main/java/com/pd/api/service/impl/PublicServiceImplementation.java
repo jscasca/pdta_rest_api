@@ -71,7 +71,7 @@ public class PublicServiceImplementation {
         
         User newUser = registration.getUserFromRegistrationForm();
         Credential credential = registration.getCredentialFromRegistrationForm(newUser);
-        newUser = DAO.put(newUser);
+        //newUser = DAO.put(newUser);
         if(newUser == null) throw new GeneralException("The user could not be created");
         DAO.put(credential);
         return newUser;

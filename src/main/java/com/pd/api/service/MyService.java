@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.pd.api.entity.Book;
@@ -29,7 +31,7 @@ import com.pd.api.security.CustomUserData;
 import com.pd.api.service.impl.MyServiceImplementation;
 
 @Controller
-@RequestMapping(value = "/api/me")
+@RequestMapping(value = "/api/myservice")
 @Secured({"ROLE_USER","ROLE_ADMIN"})
 public class MyService extends AbstractService {
 
@@ -72,6 +74,26 @@ public class MyService extends AbstractService {
             @RequestParam(value="limit", defaultValue="10") int limit,
             final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
         return MyServiceImplementation.getUserRecommendations(userData.getUsername(), first, limit);
+    }
+    
+    @RequestMapping(method = RequestMethod.PUT, value = "/displayname")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void updateDisplayName(@ModelAttribute final CustomUserData userData,
+            @RequestParam(value="src", defaultValue="") String displayName) {
+        MyServiceImplementation.updateMyDisplayName(userData.getUsername(), displayName);
+    }
+    
+    @RequestMapping(method = RequestMethod.PUT, value = "/profilepic")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void updateProfilePic(@ModelAttribute final CustomUserData userData,
+            @RequestParam(value="src", defaultValue="") String profilePic) {
+        MyServiceImplementation.updateMyDisplayName(userData.getUsername(), profilePic);
+    }
+    
+    @RequestMapping(method = RequestMethod.PUT, value = "/user")
+    @ResponseBody
+    public User getMe(@ModelAttribute final CustomUserData userData) {
+        return MyServiceImplementation.getMe(userData.getUsername());
     }
 
 }
