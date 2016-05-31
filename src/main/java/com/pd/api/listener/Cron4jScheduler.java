@@ -1,7 +1,5 @@
 package com.pd.api.listener;
 
-import java.io.IOException;
-
 import it.sauronsoftware.cron4j.Scheduler;
 
 import javax.servlet.ServletContext;
@@ -9,7 +7,6 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import com.pd.api.db.indexer.LuceneCronIndexer;
-import com.pd.api.util.LuceneIndexer;
 
 public class Cron4jScheduler implements ServletContextListener {
 

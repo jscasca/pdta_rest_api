@@ -25,6 +25,9 @@ public class LuceneCronIndexer {
     public static final String BOOK_TYPE = "BOOK";
     public static final String AUTHOR_TYPE = "AUTHOR";
     
+    private static final int DEFAULT_INDEX_BATCH = 10000;
+    private static final int INITIAL_INDEX_BATCH = 100000;
+    
     private boolean reIndexFlag = false;
     
     public LuceneCronIndexer() { }
@@ -34,16 +37,29 @@ public class LuceneCronIndexer {
     }
     
     public void index() {
-        List<Book> booksToIndex = DAO.getBooksSinceLastIndex(10000);
-        List<Author> authorsToIndex = DAO.getAuthorsSinceLastIndex(10000);
-        if(booksToIndex.isEmpty() && authorsToIndex.isEmpty()){
-            return;
+        index(DEFAULT_INDEX_BATCH);
+    }
+    
+    public void index(int indexSize) {
+        List<Book> booksToIndex = DAO.getBooksSinceLastIndex(indexSize);
+        List<Author> authorsToIndex = DAO.getAuthorsSinceLastIndex(indexSize);
+        if(!booksToIndex.isEmpty() || !authorsToIndex.isEmpty()){
+            index(false, booksToIndex, authorsToIndex);
         }
+    }
+    
+    public void reindexAll() {
+        List<Book> booksToIndex = DAO.newBooksToIndex(new BookIndex(0L,0), INITIAL_INDEX_BATCH);
+        List<Author> authorsToIndex = DAO.newAuthorsToIndex(new AuthorIndex(0L,0), INITIAL_INDEX_BATCH);
+        index(true, booksToIndex, authorsToIndex);
+    }
+    
+    public void index(boolean delete, List<Book> books, List<Author> authors) {
         try {
             IndexWriter index = getIndexWriter();
-            if(reIndexFlag) index.deleteAll();
-            BookIndex bIndex = indexBooks(index, booksToIndex);
-            AuthorIndex aIndex = indexAuthors(index, authorsToIndex);
+            if(delete)index.deleteAll();
+            BookIndex bIndex = indexBooks(index, books);
+            AuthorIndex aIndex = indexAuthors(index, authors);
             index.close();
             if(bIndex != null)DAO.put(bIndex);
             if(aIndex != null)DAO.put(aIndex);
