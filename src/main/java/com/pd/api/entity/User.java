@@ -22,7 +22,7 @@ import javax.persistence.UniqueConstraint;
 @Table(name="user", uniqueConstraints = @UniqueConstraint(columnNames = { "username" }))
 public class User implements Serializable {
 
-    public static final String default_icon = "";
+    public static final String default_icon = "img/defaultuser.png";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
