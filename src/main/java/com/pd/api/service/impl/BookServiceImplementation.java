@@ -4,6 +4,8 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.pd.api.db.DAO;
 import com.pd.api.entity.Author;
 import com.pd.api.entity.Book;
@@ -323,9 +325,7 @@ public class BookServiceImplementation {
         String icon = request.getIcon();
         String thumbnail = request.getThumbnail();
         if(request.hasNewAuthor()) {
-            //Save the author and create the work
-            author = new Author(request.getAuthorString());
-            author = DAO.put(author);
+            author = getAuthorFromString(request.getAuthorString());
             work = new Work(author, request.getTitle(), icon, thumbnail, lang);
             work = DAO.put(work);
         } else {
@@ -351,6 +351,25 @@ public class BookServiceImplementation {
         indexer.indexBook(book);
         if(request.hasNewAuthor())indexer.indexAuthor(author);*/
         return book;
+    }
+    
+    private static Author getAuthorFromString(String name) {
+        List<Author> possibleAuthors = SearchServiceImplementation.searchAuthors(name, 0, 3);
+        Author closestMatch = null;
+        int closestDistance = name.length();
+        for(Author author : possibleAuthors) {
+            int  newDistance = StringUtils.getLevenshteinDistance(name.toLowerCase(), author.getName().toLowerCase());
+            if(newDistance < closestDistance) {
+                closestDistance = newDistance;
+                closestMatch = author;
+            }
+        }
+        if(closestMatch != null && closestDistance < 1) {
+            return closestMatch;
+        } else {
+            Author newAuthor = new Author(name);
+            return DAO.put(newAuthor);
+        }
     }
     
     public static List<NewBookRequest> getBookRequests(int first, int limit) {
