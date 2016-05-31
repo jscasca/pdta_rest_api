@@ -19,7 +19,7 @@ import javax.persistence.Transient;
 @Table(name="author")
 public class Author implements Serializable {
 
-    public static final String default_icon = "";
+    public static final String default_icon = "img/defaultauthor.png";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
