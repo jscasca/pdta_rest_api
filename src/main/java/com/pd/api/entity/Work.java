@@ -19,8 +19,8 @@ import javax.persistence.Transient;
 @Table(name="work")
 public class Work {
     
-    public static final String DEFAULT_ICON = "http://posdta.com/web/img/default.png";
-    public static final String DEFAULT_THUMBNAIL = "http://posdta.com/web/img/defaultthumb.png";
+    public static final String DEFAULT_ICON = "img/default.png";
+    public static final String DEFAULT_THUMBNAIL = "img/defaultthumb.png";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

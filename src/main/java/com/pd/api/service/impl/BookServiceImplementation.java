@@ -358,6 +358,7 @@ public class BookServiceImplementation {
         Author closestMatch = null;
         int closestDistance = name.length();
         for(Author author : possibleAuthors) {
+            if(author == null) continue;
             int  newDistance = StringUtils.getLevenshteinDistance(name.toLowerCase(), author.getName().toLowerCase());
             if(newDistance < closestDistance) {
                 closestDistance = newDistance;

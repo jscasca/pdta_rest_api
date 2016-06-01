@@ -16,9 +16,9 @@ public class BookRequestWrapper {
     
     public String language;
     
-    public String icon = Work.DEFAULT_ICON;
+    public String icon;
     
-    public String thumbnail = Work.DEFAULT_THUMBNAIL;
+    public String thumbnail;
     
     public BookRequestWrapper() {}
     public BookRequestWrapper(String title, String author, String language, long authorId, long workId, String icon, String thumbnail) {
@@ -27,8 +27,8 @@ public class BookRequestWrapper {
         this.language = language;
         this.authorId = authorId;
         this.workId = workId;
-        if(icon != "") this.icon = icon;
-        if(thumbnail != "") this.thumbnail = thumbnail;
+        this.icon = icon;
+        this.thumbnail = thumbnail;
     }
     
     public String getTitle() {
@@ -47,8 +47,8 @@ public class BookRequestWrapper {
         return workId;
     }
     
-    public String getIcon() {return icon;}
-    public String getThumbnail() {return thumbnail;}
+    public String getIcon() { if("".equals(icon))return Work.DEFAULT_ICON;else return icon;}
+    public String getThumbnail() {if("".equals(thumbnail)) return Work.DEFAULT_THUMBNAIL; else return thumbnail;}
     
     public String getLanguageString() {
         return language;
