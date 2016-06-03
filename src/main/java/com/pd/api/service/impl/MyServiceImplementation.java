@@ -23,6 +23,7 @@ import com.pd.api.entity.UserRecommendations;
 import com.pd.api.entity.aux.LibraryView;
 import com.pd.api.entity.aux.LoggedInWrapper;
 import com.pd.api.exception.GeneralException;
+import com.pd.api.exception.InvalidParameterException;
 import com.pd.api.util.RecommendationUtil;
 
 public class MyServiceImplementation {
@@ -52,14 +53,16 @@ public class MyServiceImplementation {
     }
     
     public static void updateMyDisplayName(String username, String displayName) {
+        if(displayName == "") throw new InvalidParameterException("The user display name can not be empty");
         User user = DAO.getUserByUsername(username);
         user.setDisplayName(displayName);
         DAO.put(user);
     }
     
-    public static void updateMyProfilePic(String username, String profilePic) {
+    public static void updateMyAvatar(String username, String avatar) {
+        if(avatar == "") avatar = User.default_icon;
         User user = DAO.getUserByUsername(username);
-        user.setIcon(profilePic);
+        user.setIcon(avatar);
         DAO.put(user);
     }
     

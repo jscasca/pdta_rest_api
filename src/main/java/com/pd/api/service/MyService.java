@@ -2,7 +2,6 @@ package com.pd.api.service;
 
 import java.security.Principal;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -10,11 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,7 +19,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.pd.api.entity.Book;
-import com.pd.api.entity.Role;
 import com.pd.api.entity.User;
 import com.pd.api.entity.aux.LibraryView;
 import com.pd.api.entity.aux.LoggedInWrapper;
@@ -48,9 +43,9 @@ public class MyService extends AbstractService {
             final Principal principal,
             final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
         
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        CustomUserData cu = loadUserFromSecurityContext();
-        String as = auth.toString();
+        //Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        //CustomUserData cu = loadUserFromSecurityContext();
+        //String as = auth.toString();
         return MyServiceImplementation.getMe(userData.getUsername());
     }
     
@@ -79,15 +74,15 @@ public class MyService extends AbstractService {
     @RequestMapping(method = RequestMethod.PUT, value = "/displayname")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void updateDisplayName(@ModelAttribute final CustomUserData userData,
-            @RequestParam(value="src", defaultValue="") String displayName) {
-        MyServiceImplementation.updateMyDisplayName(userData.getUsername(), displayName);
+            @RequestParam(value="name", defaultValue="") String name) {
+        MyServiceImplementation.updateMyDisplayName(userData.getUsername(), name);
     }
     
-    @RequestMapping(method = RequestMethod.PUT, value = "/profilepic")
+    @RequestMapping(method = RequestMethod.PUT, value = "/avatar")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void updateProfilePic(@ModelAttribute final CustomUserData userData,
-            @RequestParam(value="src", defaultValue="") String profilePic) {
-        MyServiceImplementation.updateMyDisplayName(userData.getUsername(), profilePic);
+    public void updateAvatar(@ModelAttribute final CustomUserData userData,
+            @RequestParam(value="src", defaultValue="") String avatar) {
+        MyServiceImplementation.updateMyAvatar(userData.getUsername(), avatar);
     }
     
     @RequestMapping(method = RequestMethod.PUT, value = "/user")
