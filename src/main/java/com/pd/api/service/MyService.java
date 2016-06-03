@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,6 +23,7 @@ import com.pd.api.entity.Book;
 import com.pd.api.entity.User;
 import com.pd.api.entity.aux.LibraryView;
 import com.pd.api.entity.aux.LoggedInWrapper;
+import com.pd.api.entity.aux.StringWrapper;
 import com.pd.api.security.CustomUserData;
 import com.pd.api.service.impl.MyServiceImplementation;
 
@@ -71,18 +73,22 @@ public class MyService extends AbstractService {
         return MyServiceImplementation.getUserRecommendations(userData.getUsername(), first, limit);
     }
     
-    @RequestMapping(method = RequestMethod.PUT, value = "/displayname")
+    @RequestMapping(method = RequestMethod.POST, value = "/displayname")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void updateDisplayName(@ModelAttribute final CustomUserData userData,
-            @RequestParam(value="name", defaultValue="") String name) {
-        MyServiceImplementation.updateMyDisplayName(userData.getUsername(), name);
+            @RequestBody final StringWrapper name) {
+        MyServiceImplementation.updateMyDisplayName(userData.getUsername(), name.getValue());
     }
     
-    @RequestMapping(method = RequestMethod.PUT, value = "/avatar")
+    /**
+     * Ideally this method should use PUT.
+     * Due to some Spring MVC issues POST had to be used instead
+     */
+    @RequestMapping(method = RequestMethod.POST, value = "/avatar")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void updateAvatar(@ModelAttribute final CustomUserData userData,
-            @RequestParam(value="src", defaultValue="") String avatar) {
-        MyServiceImplementation.updateMyAvatar(userData.getUsername(), avatar);
+            @RequestBody final StringWrapper avatar) {
+        MyServiceImplementation.updateMyAvatar(userData.getUsername(), avatar.getValue());
     }
     
     @RequestMapping(method = RequestMethod.PUT, value = "/user")

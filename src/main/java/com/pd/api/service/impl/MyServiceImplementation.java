@@ -53,14 +53,14 @@ public class MyServiceImplementation {
     }
     
     public static void updateMyDisplayName(String username, String displayName) {
-        if(displayName == "") throw new InvalidParameterException("The user display name can not be empty");
+        if(displayName.equals("")) throw new InvalidParameterException("The user display name can not be empty");
         User user = DAO.getUserByUsername(username);
         user.setDisplayName(displayName);
         DAO.put(user);
     }
     
     public static void updateMyAvatar(String username, String avatar) {
-        if(avatar == "") avatar = User.default_icon;
+        if(avatar.equals("")) avatar = User.default_icon;
         User user = DAO.getUserByUsername(username);
         user.setIcon(avatar);
         DAO.put(user);
