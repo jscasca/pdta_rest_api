@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.pd.api.db.DAO;
 import com.pd.api.entity.Author;
@@ -33,6 +35,8 @@ import com.pd.api.util.LuceneIndexer;
 
 public class BookServiceImplementation {
 
+    static final Logger LOG = LoggerFactory.getLogger(BookServiceImplementation.class);
+    
     public static List<Book> getBooks(int start, int limit) {
         return DAO.getAll(Book.class, start, limit);
     }
@@ -134,19 +138,28 @@ public class BookServiceImplementation {
     public static void startReadingBook(String username, Long bookId) {
         User user = DAO.getUserByUsername(username);
         Book book = DAO.get(Book.class, bookId);
+        LOG.debug(user.getUserName() + " to start reading " + book.getTitle());
         //Check if he was reading already
         BookReading reading = DAO.getUnique(BookReading.class, "where user = ? and book = ?", user, book);
-        if(reading != null) return;
+        
+        if(reading != null) {
+            LOG.debug("user is already reading this book");
+            return;
+        }
         reading = new BookReading(user, book);
         reading = DAO.put(reading);
+        LOG.debug("Reading is saved");
         //Update book reading info
         BookRating rating = book.getRating();
         rating.addReading();
         book = DAO.put(book);
+        LOG.debug("Book metrics are updated");
         //Check if it was wish listed and remove
         unwishlistBook(user, book);
+        LOG.debug("Book was unwishlisted");
         EventWithBook startReadingEvent = new EventWithBook(user, Event.EventType.STARTED_READING, book);
         DAO.put(startReadingEvent);
+        LOG.debug("Book reading event was saved");
     }
     
     /**

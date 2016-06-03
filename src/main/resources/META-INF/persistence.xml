@@ -32,7 +32,7 @@
       <property name="hibernate.connection.provider_class" value="org.hibernate.connection.C3P0ConnectionProvider" />
 
       <!-- Print SQL to stdout -->
-      <property name="hibernate.show_sql" value="true" />
+      <!--<property name="hibernate.show_sql" value="true" />-->
 
     </properties>
 
