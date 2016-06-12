@@ -1,17 +1,22 @@
 package com.pd.api.entity;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.Type;
 
@@ -45,9 +50,15 @@ public class Posdta {
     
     private int rating;
     
-    @OneToOne(cascade=CascadeType.ALL)
-    @PrimaryKeyJoinColumn
+    @OneToOne(mappedBy="posdta", cascade=CascadeType.ALL, fetch=FetchType.EAGER)
     private PosdtaVoting votes;
+    
+    @OneToMany(fetch = FetchType.LAZY, cascade={CascadeType.ALL})
+    @JoinColumn(name="posdta_id")
+    private Set<UserVote> userVotes;
+    
+    @Transient
+    private String className = "Posdta";
     
     public Posdta() {}
     public Posdta(BookReading reading, String posdta, int rating) {
@@ -60,6 +71,8 @@ public class Posdta {
         this.start = start;
         this.posdta = posdta;
         this.rating = rating;
+        this.votes = new PosdtaVoting();
+        this.userVotes = new HashSet<UserVote>();
     }
     public Posdta(User user, Book book, String posdta, int rating) {
         this.user = user;
@@ -67,6 +80,8 @@ public class Posdta {
         this.book = book;
         this.posdta = posdta;
         this.rating = rating;
+        this.votes = new PosdtaVoting();
+        this.userVotes = new HashSet<UserVote>();
     }
     
     public Long getId() {
@@ -107,6 +122,24 @@ public class Posdta {
     
     public void setVotes(PosdtaVoting votes) {
         this.votes = votes;
+    }
+    
+    public void addVote(UserVote vote) {
+        this.userVotes.add(vote);
+        if(vote.isUpvote()) {
+            this.votes.upvote();
+        } else {
+            this.votes.downvote();
+        }
+    }
+    
+    public void removeVote(UserVote vote) {
+        this.userVotes.remove(vote);
+        if(vote.isUpvote()) {
+            this.votes.removeUpvote();
+        } else {
+            this.votes.removeDownvote();
+        }
     }
     
     @Override

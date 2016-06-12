@@ -2,32 +2,50 @@ package com.pd.api.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name="posdta_voting")
 public class PosdtaVoting {
 
+
     @Id
-    @Column(name="posdta_id")
+    @Column(name="posdta_id", unique=true, nullable=false)
+    @GenericGenerator(name="gen", strategy="foreign", parameters=@Parameter(name="property", value="posdta"))
+    @GeneratedValue(generator="gen")
     private Long id;
+    
+    @JsonIgnore
+    @OneToOne(optional=false, fetch=FetchType.LAZY)
+    @PrimaryKeyJoinColumn
+    private Posdta posdta;
     
     private int upvotes;
     private int downvotes;
     
-    protected PosdtaVoting() {
+    @Transient
+    private String className = "PosdtaVote";
+    
+    public PosdtaVoting() {
         upvotes = 0;
         downvotes = 0;
     }
-    public PosdtaVoting(Posdta p) {
-        super();
-        id = p.getId();
-    }
     
-    public PosdtaVoting(Long posdtaId) {
-        super();
-        id = posdtaId;
+    public void setPosdta(Posdta posdta) {
+        this.posdta = posdta;
     }
     
     public int getUpvotes() {
@@ -70,5 +88,9 @@ public class PosdtaVoting {
     public void changeToDownvote() {
         downvotes++;
         upvotes--;
+    }
+    
+    public String toString() {
+        return upvotes+"-"+downvotes;
     }
 }

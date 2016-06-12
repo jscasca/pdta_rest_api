@@ -2,17 +2,51 @@ package com.pd.api.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table(name="book_rating")
+@Table(name="book_rating", uniqueConstraints = @UniqueConstraint(columnNames = { "book_id" }))
 public class BookRating {
-
+    
+    /*
+     * 
     @Id
-    @Column(name="book_id")
+    @Column(name="employee_id", unique=true, nullable=false)
+    @GeneratedValue(generator="gen")
+    @GenericGenerator(name="gen", strategy="foreign", parameters=@Parameter(name="property", value="employee"))
+    private Long employeeId;
+    
+     *
+     *@GenericGenerator(name = "generator", strategy = "foreign", 
+    parameters = @Parameter(name = "property", value = "stock"))
+    @Id
+    @GeneratedValue(generator = "generator")
+    @Column(name = "STOCK_ID", unique = true, nullable = false)
+     */
+    @Id
+    @Column(name="book_id", unique=true, nullable=false)
+    @GenericGenerator(name="gen", strategy="foreign", parameters=@Parameter(name="property", value="book"))
+    @GeneratedValue(generator="gen")
     private Long id;
+    
+    @JsonIgnore
+    @OneToOne(optional=false, fetch=FetchType.LAZY)
+    @PrimaryKeyJoinColumn
+    private Book book;
     
     private int rated1;
     private int rated2;
@@ -24,11 +58,8 @@ public class BookRating {
     private int wishlisted;
     private int favorited;
     
-    public BookRating() {}
-    public BookRating(Book book) {this(book.getId(), 0, 0, 0, 0, 0, 0, 0, 0);}
-    public BookRating(Long bookId) {this(bookId, 0, 0, 0, 0, 0, 0, 0, 0);}
-    public BookRating(Long bookId, int r1, int r2, int r3, int r4, int r5, int ring, int wish, int fav) {
-        id = bookId;
+    public BookRating() {this(0, 0, 0, 0, 0, 0, 0, 0);}
+    public BookRating(int r1, int r2, int r3, int r4, int r5, int ring, int wish, int fav) {
         rated1 = r1;
         rated2 = r2;
         rated3 = r3;
@@ -62,7 +93,7 @@ public class BookRating {
         calculateRating();
     }
     
-    public Long getBookId() { return id;}
+    public Long getId() { return id;}
     public int getRated1() { return rated1;}
     public int getRated2() { return rated2;}
     public int getRated3() { return rated3;}
@@ -73,6 +104,7 @@ public class BookRating {
     public int getFavorited() { return favorited;}
     public double getRating() {return rated;}
     
+    public void setBook(Book book){this.book = book;}
     public void setRated1(int r) { rated1 = r;}
     public void setRated2(int r) { rated2 = r;}
     public void setRated3(int r) { rated3 = r;}

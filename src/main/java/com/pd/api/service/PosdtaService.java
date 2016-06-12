@@ -20,6 +20,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.pd.api.entity.Author;
 import com.pd.api.entity.Book;
 import com.pd.api.entity.Posdta;
+import com.pd.api.entity.PosdtaVoting;
 import com.pd.api.entity.Work;
 import com.pd.api.entity.aux.AuthorWrapper;
 import com.pd.api.entity.aux.WorkWrapper;
@@ -41,18 +42,18 @@ public class PosdtaService {
     
     @Secured("ROLE_USER")
     @RequestMapping(value="/{id:[0-9]+}/upvote", method = RequestMethod.POST)
-    @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void upvotePosdta(@ModelAttribute CustomUserData userData,
+    @ResponseBody
+    public PosdtaVoting upvotePosdta(@ModelAttribute CustomUserData userData,
             @PathVariable("id") final Long posdtaId) {
-        PosdtaServiceImplementation.upvotePosdta(userData.getUsername(), posdtaId);
+        return PosdtaServiceImplementation.upvotePosdta(userData.getUsername(), posdtaId);
     }
     
     @Secured("ROLE_USER")
     @RequestMapping(value="/{id:[0-9]+}/downvote", method = RequestMethod.POST)
-    @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void downvotePosdta(@ModelAttribute CustomUserData userData,
+    @ResponseBody
+    public PosdtaVoting downvotePosdta(@ModelAttribute CustomUserData userData,
             @PathVariable("id") final Long posdtaId) {
-        PosdtaServiceImplementation.downvotePosdta(userData.getUsername(), posdtaId);
+        return PosdtaServiceImplementation.downvotePosdta(userData.getUsername(), posdtaId);
     }
     
     @Secured("ROLE_USER")
@@ -60,7 +61,8 @@ public class PosdtaService {
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void removeUpvote(@ModelAttribute CustomUserData userData,
             @PathVariable("id") final Long posdtaId) {
-        PosdtaServiceImplementation.removeUpvote(userData.getUsername(), posdtaId);
+        //TODO: design if implementation is reasonable
+        //PosdtaServiceImplementation.removeUpvote(userData.getUsername(), posdtaId);
     }
     
     @Secured("ROLE_USER")

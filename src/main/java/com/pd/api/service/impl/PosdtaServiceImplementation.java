@@ -22,16 +22,10 @@ public class PosdtaServiceImplementation {
         //return DAO.getAll(Author.class, first, limit);
     }
     
-    public static void upvotePosdta(String username, Long posdtaId) {
+    public static PosdtaVoting upvotePosdta(String username, Long posdtaId) {
         User user = DAO.getUserByUsername(username);
         Posdta posdta =DAO.get(Posdta.class, posdtaId);
-        UserVote vote = DAO.getUnique(UserVote.class, "select v from UserVote where user = ? and posdta = ?", user, posdta);
-        if(posdta.getVotes() == null) {
-            PosdtaVoting votes = new PosdtaVoting(posdta);
-            //TODO Calculate votes here
-            posdta.setVotes(votes);
-            DAO.put(posdta);
-        }
+        UserVote vote = DAO.getUnique(UserVote.class, "where user = ? and posdta = ?", user, posdta);
         if(vote != null) {
             if(vote.isUpvote()) {                
                 throw new InvalidStateException("You already upvoted this posdta");
@@ -45,7 +39,8 @@ public class PosdtaServiceImplementation {
             posdta.getVotes().upvote();
         }
         DAO.put(vote);
-        DAO.put(posdta);
+        posdta = DAO.put(posdta);
+        return posdta.getVotes();
     }
     
     public static void removeUpvote(String username, Long posdtaId) {
@@ -58,18 +53,13 @@ public class PosdtaServiceImplementation {
         if(vote.isDownvote()) {
             throw new InvalidStateException("You have not voted this posdta");
         }
+        DAO.delete(vote);
     }
     
-    public static void downvotePosdta(String username, Long posdtaId) {
+    public static PosdtaVoting downvotePosdta(String username, Long posdtaId) {
         User user = DAO.getUserByUsername(username);
         Posdta posdta =DAO.get(Posdta.class, posdtaId);
-        UserVote vote = DAO.getUnique(UserVote.class, "select v from UserVote where user = ? and posdta = ?", user, posdta);
-        if(posdta.getVotes() == null) {
-            PosdtaVoting votes = new PosdtaVoting(posdta);
-            //TODO Calculate votes here
-            posdta.setVotes(votes);
-            DAO.put(posdta);
-        }
+        UserVote vote = DAO.getUnique(UserVote.class, "where user = ? and posdta = ?", user, posdta);
         if(vote != null) {
             if(vote.isDownvote()) {                
                 throw new InvalidStateException("You already downvoted this posdta");
@@ -83,6 +73,7 @@ public class PosdtaServiceImplementation {
             posdta.getVotes().downvote();
         }
         DAO.put(vote);
-        DAO.put(posdta);
+        posdta = DAO.put(posdta);
+        return posdta.getVotes();
     }
 }

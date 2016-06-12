@@ -22,6 +22,7 @@ import com.pd.api.entity.EventWithPosdta;
 import com.pd.api.entity.Language;
 import com.pd.api.entity.NewBookRequest;
 import com.pd.api.entity.Posdta;
+import com.pd.api.entity.PosdtaVoting;
 import com.pd.api.entity.User;
 import com.pd.api.entity.Work;
 import com.pd.api.entity.WorkRating;
@@ -127,6 +128,12 @@ public class BookServiceImplementation {
         return DAO.getAll(Posdta.class, "where book.id = ?", "", start, limit, bookId);
     }
     
+    public static List<Object[]> getBookPosdtasWithUserVotes(String username, Long bookId, int start, int limit) {
+        User user = DAO.getUserByUsername(username);
+        Book book = DAO.get(Book.class, bookId);
+        return DAO.getPosdtasWithVotesByBook(user, book, start, limit);
+    }
+    
     //get reading by book
     
     /**
@@ -205,7 +212,9 @@ public class BookServiceImplementation {
         } else {
             posdta = posdtaWrapper.getPosdta(user, book);
         }
-        
+        PosdtaVoting votes = new PosdtaVoting();
+        posdta.setVotes(votes);
+        votes.setPosdta(posdta);
         posdta = DAO.put(posdta);
         
         WorkRating wr = DAO.getUnique(WorkRating.class, "where work = ?", book.getWork());
@@ -216,15 +225,15 @@ public class BookServiceImplementation {
         work.updateRating(wr);
         work = DAO.put(work);
         
-        BookRating rating = book.getRating();
-        rating.addRating(posdta.getRating());
+        book.getRating().addRating(posdta.getRating());
+        book = DAO.put(book);
         if(reading != null) {
-            rating.removeReading();
+            book.getRating().removeReading();
             DAO.remove(reading.getClass(), reading.getId());
         }
         BookWishlisted wishlisted = DAO.getUnique(BookWishlisted.class, "where user = ? and book = ?", user, book);
         if(wishlisted != null) {
-            rating.removeWishlisted();
+            book.getRating().removeWishlisted();
             DAO.remove(wishlisted.getClass(), wishlisted.getId());
         }
         book = DAO.put(book);
@@ -246,8 +255,7 @@ public class BookServiceImplementation {
         if(favorited != null) return;
         favorited = new BookFavorited(user, book);
         favorited = DAO.put(favorited);
-        BookRating rating = book.getRating();
-        rating.addFavorited();
+        book.getRating().addFavorited();
         book = DAO.put(book);
         EventWithBook favoriteEvent = new EventWithBook(user, Event.EventType.FAVORITED, book);
         favoriteEvent = DAO.put(favoriteEvent);
@@ -282,8 +290,8 @@ public class BookServiceImplementation {
         if(wishlisted != null)return;
         wishlisted = new BookWishlisted(user, book);
         wishlisted = DAO.put(wishlisted);
-        BookRating rating = book.getRating();
-        rating.addWishlisted();
+        book.getRating().addWishlisted();
+        DAO.put(book);
         EventWithBook wishlistEvent = new EventWithBook(user, Event.EventType.WISHLISTED, book);
         wishlistEvent = DAO.put(wishlistEvent);
     }
@@ -354,15 +362,13 @@ public class BookServiceImplementation {
             }
         }
         book = new Book(work, request.getTitle(), icon, thumbnail, lang);
+        BookRating rating = new BookRating();
+        book.setRating(rating);
+        rating.setBook(book);
         book = DAO.put(book);
         //Create bookRequest
         NewBookRequest requestLog = new NewBookRequest(user, request.getTitle(), request.getAuthorString(), request.getLanguageString());
         DAO.put(requestLog);
-        //Index
-        //TODO: mark for indexing
-        /*LuceneIndexer indexer = LuceneIndexer.getInstance();
-        indexer.indexBook(book);
-        if(request.hasNewAuthor())indexer.indexAuthor(author);*/
         return book;
     }
     

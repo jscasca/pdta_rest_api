@@ -2,13 +2,13 @@ package com.pd.api.entity;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -30,8 +30,7 @@ public class Book {
     @JoinColumn(name="work_id")
     private Work work;
     
-    @OneToOne(cascade=CascadeType.ALL)
-    @PrimaryKeyJoinColumn
+    @OneToOne(mappedBy = "book", cascade=CascadeType.ALL, fetch=FetchType.EAGER)
     private BookRating rating;
     
     private String title;

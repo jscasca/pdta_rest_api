@@ -78,10 +78,13 @@ public class DAO {
         EntityManager em = getEM();
         EntityTransaction tx = em.getTransaction();
         if(tx.isActive()) {
-            return em.merge(obj);
+            Object o = em.merge(obj);
+            em.flush();
+            return(T) o;
         } else {
             tx.begin();
             Object o = em.merge(obj);
+            em.flush();
             tx.commit();
             return (T) o;
         }
@@ -129,6 +132,7 @@ e2.setSomeField(anotherValue);
     public static <T> T merge(T obj) {
         EntityManager em = getEM();
         obj = em.merge(obj);
+        em.flush();
         return obj;
     }
     
@@ -144,6 +148,10 @@ e2.setSomeField(anotherValue);
             em.remove(obj);
         }
     }*/
+    
+    public static void flush() {
+        getEM().flush();
+    }
     
     public static <T> T remove(Class<T> type, Long id) {
         T obj = null;
@@ -414,28 +422,38 @@ e2.setSomeField(anotherValue);
     }
     
     public static BookRating getBookRating(Long bookId) {
-        BookRating rating = DAO.get(BookRating.class, bookId);
+        Book book = get(Book.class, bookId);
+        BookRating rating = book.getRating();
+        if(rating == null) {
+            rating = new BookRating();
+            rating.setBook(book);
+            rating = DAO.put(rating);
+            book.setRating(rating);
+            book = DAO.put(book);
+        }
+        return rating;
+        /*BookRating rating = DAO.get(BookRating.class, bookId);
         if(rating == null) {
             //Create a new rating and save it
             Book book = get(Book.class, bookId);
             if(book == null) {
                 return null;
             }
-            rating = new BookRating(book.getId());
+            rating = new BookRating(book);
             //Maybe try to update here?
             rating = put(rating);
             book.setRating(rating);
             book = put(book);
         }
-        return rating;
+        return rating;*/
     }
     
     public static BookRating getBookRating(Book book) {
-        BookRating rating = get(BookRating.class, book.getId());
+        BookRating rating = book.getRating();
         if(rating == null) {
-            rating = new BookRating(book.getId());
-            rating = put(rating);
+            rating = new BookRating();
             book.setRating(rating);
+            rating.setBook(book);
             book = put(book);
         }
         return rating;
@@ -479,11 +497,6 @@ e2.setSomeField(anotherValue);
     //TODO: fix this method 
     public static BookInfo getBookInfo(Long bookId) {
         Book book = get(Book.class, bookId);
-        if(book.getRating() == null) {
-            BookRating rating = new BookRating(book);
-            book.setRating(rating);
-            book = put(book);
-        }
         BookRating rating = book.getRating();
         BookInfo info = new BookInfo(rating, book);
         return info;
@@ -549,5 +562,10 @@ e2.setSomeField(anotherValue);
         } catch(Exception e) {
             return null;
         }
+    }
+    
+    public static List<Object[]> getPosdtasWithVotesByBook(User user, Book book, int start, int limit) {
+        Query q = createQuery("select p, v from Posdta as p left outer join p.userVotes as v where p.book = ? AND (v.user = ? OR v.user = null) ", book, user);
+        return (List<Object[]>)q.getResultList();
     }
 }

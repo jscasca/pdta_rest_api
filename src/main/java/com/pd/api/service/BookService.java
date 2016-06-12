@@ -220,6 +220,15 @@ public class BookService {
         return BookServiceImplementation.getBookPosdtas(bookId, start, limit);
     }
     
+    @RequestMapping(value="/{id:[0-9]+}/posdtas/votes", method = RequestMethod.GET)
+    @ResponseBody
+    public List<Object[]> posdtasWithUserVote(@ModelAttribute final CustomUserData userData,
+            @PathVariable("id") final Long bookId,
+            @RequestParam(value="start", defaultValue="0") final int start,
+            @RequestParam(value="limit", defaultValue="10") final int limit) {
+        return BookServiceImplementation.getBookPosdtasWithUserVotes(userData.getUsername(), bookId, start, limit);
+    }
+    
     /**
      * A map of interactions between the user and the book
      * @param bookId

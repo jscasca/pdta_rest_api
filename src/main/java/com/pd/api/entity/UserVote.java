@@ -68,4 +68,8 @@ public class UserVote {
     public void makeDownvote() {
         this.vote = false;
     }
+    
+    public String toString() {
+        return user.getUserName()+":"+posdta.getId()+(vote?"+1":"-1");
+    }
 }
