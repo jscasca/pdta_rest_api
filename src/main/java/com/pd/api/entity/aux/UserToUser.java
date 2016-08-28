@@ -14,6 +14,8 @@ public class UserToUser {
     public UserToUser(User owner, User viewed) {
         this.owner = owner;
         this.viewed = viewed;
+        following = owner.isFollowing(viewed);
+        follower = viewed.isFollowing(owner);
     }
     
     public boolean isFollowing() {

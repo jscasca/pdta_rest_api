@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.pd.api.entity.Book;
+import com.pd.api.entity.Posdta;
 import com.pd.api.entity.User;
 import com.pd.api.entity.aux.LibraryView;
 import com.pd.api.entity.aux.LoggedInWrapper;
@@ -62,6 +63,42 @@ public class MyService extends AbstractService {
     @ResponseBody
     public LibraryView getMyLibrary(@ModelAttribute final CustomUserData userData) {
         return MyServiceImplementation.getUserLibraryView(userData.getUsername());
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value="/wishlists")
+    @ResponseBody
+    public List<Book> getWishlisted(@ModelAttribute final CustomUserData userData,
+            @RequestParam(value="start", defaultValue="0") int first,
+            @RequestParam(value="limit", defaultValue="10") int limit,
+            final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
+        return MyServiceImplementation.getWishlisted(userData.getUsername(), first, limit);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value="/readings")
+    @ResponseBody
+    public List<Book> getReadings(@ModelAttribute final CustomUserData userData,
+            @RequestParam(value="start", defaultValue="0") int first,
+            @RequestParam(value="limit", defaultValue="10") int limit,
+            final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
+        return MyServiceImplementation.getReading(userData.getUsername(), first, limit);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value="/favorites")
+    @ResponseBody
+    public List<Book> getFavorites(@ModelAttribute final CustomUserData userData,
+            @RequestParam(value="start", defaultValue="0") int first,
+            @RequestParam(value="limit", defaultValue="10") int limit,
+            final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
+        return MyServiceImplementation.getFavorited(userData.getUsername(), first, limit);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value="/posdtas")
+    @ResponseBody
+    public List<Posdta> getPosdtas(@ModelAttribute final CustomUserData userData,
+            @RequestParam(value="start", defaultValue="0") int first,
+            @RequestParam(value="limit", defaultValue="10") int limit,
+            final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
+        return MyServiceImplementation.getPosdtas(userData.getUsername(), first, limit);
     }
     
     @RequestMapping(method = RequestMethod.GET, value="/recommendations")

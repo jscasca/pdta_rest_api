@@ -14,17 +14,13 @@ public class UserInfo {
     public static final int DEFAULT_POSDTA_LIMIT = 10;
     
     private User user;
-    private List<Book> reading = new ArrayList<Book>();
-    private List<Book> wishlisted = new ArrayList<Book>();
-    private List<Book> favorited = new ArrayList<Book>();
-    private List<Posdta> posdtas = new ArrayList<Posdta>();
-    //Users who USER is following
-    private List<User> following = new ArrayList<User>();
-    //Users who are following USER
-    private List<User> followers = new ArrayList<User>();
     
-    private int followerCount = 0;
-    private int followingCount = 0;
+    private int followers = 0;
+    private int following = 0;
+    private int reading = 0;
+    private int wishlisted = 0;
+    private int favorited = 0;
+    private int posdtas = 0;
     
     private String className = "UserInfo";
 
@@ -38,32 +34,23 @@ public class UserInfo {
         //This is just the basic idea
     }
     
-    public UserInfo(User user, List<Book> reading, List<Book> wishlisted, List<Book> favorited, List<Posdta> posdtas, int followerCount, int followingCount) {
+    public UserInfo(User user, int reading, int wishlisted, int favorited, int posdtas, int followerCount, int followingCount) {
         this(user);
         this.reading = reading;
         this.wishlisted = wishlisted;
         this.favorited = favorited;
         this.posdtas = posdtas;
-        this.followerCount = followerCount;
-        this.followingCount = followingCount;
+        this.followers = followerCount;
+        this.following = followingCount;
     }
     
-    public void setReadingList(List<Book> readingList) { this.reading = readingList;}
-    public void setWishList(List<Book> wishList) { this.wishlisted = wishList;}
-    public void setFavoriteList(List<Book> favoriteList) { this.favorited = favoriteList;}
-    public void setPosdtas(List<Book> posdtaList) { this.reading = posdtaList;}
-    public void setFollowers(List<User> followerList) { this.followers = followerList;}
-    public void setFollowing(List<User> followingList) { this.followers = followingList;}
-    
     public User getUser() {return user;}
-    public List<Book> getBooksReading() {return reading;}
-    public List<Book> getBooksWishlisted() {return wishlisted;}
-    public List<Book> getBooksFavorited() {return favorited;}
-    public List<Posdta> getPosdtas() {return posdtas;}
-    public List<User> getFollowers() {return followers;}
-    public List<User> getFollowing() {return following;}
-    public int getFollowerCount() {return followerCount;}
-    public int getFollowingCount() {return followingCount;}
+    public int getBooksReading() {return reading;}
+    public int getBooksWishlisted() {return wishlisted;}
+    public int getBooksFavorited() {return favorited;}
+    public int getPosdtas() {return posdtas;}
+    public int getFollowers() {return followers;}
+    public int getFollowing() {return following;}
     public String getClassName() {return className;}
     
 }

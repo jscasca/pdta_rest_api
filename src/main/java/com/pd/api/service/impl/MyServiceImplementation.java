@@ -52,6 +52,26 @@ public class MyServiceImplementation {
         return lv;
     }
     
+    public static List<Book> getWishlisted(String username, int start, int limit) {
+        User user = DAO.getUserByUsername(username);
+        return DAO.getUserWishlisted(user.getId(), start, limit);
+    }
+    
+    public static List<Book> getReading(String username, int start, int limit) {
+        User user = DAO.getUserByUsername(username);
+        return DAO.getUserReading(user.getId(), start, limit);
+    }
+    
+    public static List<Book> getFavorited(String username, int start, int limit) {
+        User user = DAO.getUserByUsername(username);
+        return DAO.getUserFavorites(user.getId(), start, limit);
+    }
+    
+    public static List<Posdta> getPosdtas(String username, int start, int limit) {
+        User user = DAO.getUserByUsername(username);
+        return DAO.getUserPosdtas(user.getId(), start, limit);
+    }
+    
     public static void updateMyDisplayName(String username, String displayName) {
         if(displayName.equals("")) throw new InvalidParameterException("The user display name can not be empty");
         User user = DAO.getUserByUsername(username);

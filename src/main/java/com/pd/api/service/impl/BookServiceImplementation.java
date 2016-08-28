@@ -164,8 +164,7 @@ public class BookServiceImplementation {
         //Check if it was wish listed and remove
         unwishlistBook(user, book);
         LOG.debug("Book was unwishlisted");
-        EventWithBook startReadingEvent = new EventWithBook(user, Event.EventType.STARTED_READING, book);
-        DAO.put(startReadingEvent);
+        DAO.saveEventWithBook(new EventWithBook(user, Event.EventType.STARTED_READING, book));
         LOG.debug("Book reading event was saved");
     }
     
@@ -257,8 +256,7 @@ public class BookServiceImplementation {
         favorited = DAO.put(favorited);
         book.getRating().addFavorited();
         book = DAO.put(book);
-        EventWithBook favoriteEvent = new EventWithBook(user, Event.EventType.FAVORITED, book);
-        favoriteEvent = DAO.put(favoriteEvent);
+        DAO.saveEventWithBook(new EventWithBook(user, Event.EventType.FAVORITED, book));
     }
     
     /**
@@ -292,8 +290,7 @@ public class BookServiceImplementation {
         wishlisted = DAO.put(wishlisted);
         book.getRating().addWishlisted();
         DAO.put(book);
-        EventWithBook wishlistEvent = new EventWithBook(user, Event.EventType.WISHLISTED, book);
-        wishlistEvent = DAO.put(wishlistEvent);
+        DAO.saveEventWithBook(new EventWithBook(user, Event.EventType.WISHLISTED, book));
     }
     
     /**
@@ -336,8 +333,9 @@ public class BookServiceImplementation {
      * @param newRequestWrapper
      * @return the book created
      */
-    public static Book requestNewBook(String username, BookRequestWrapper request) {
-        User user = DAO.getUserByUsername(username);
+    public static Book requestNewBook(BookRequestWrapper request) {
+    //public static Book requestNewBook(String username, BookRequestWrapper request) {
+        //User user = DAO.getUserByUsername(username);
         Work work = null;
         Book book = null;
         Author author = null;
@@ -347,34 +345,46 @@ public class BookServiceImplementation {
         String thumbnail = request.getThumbnail();
         if(request.hasNewAuthor()) {
             author = getAuthorFromString(request.getAuthorString());
-            work = new Work(author, request.getTitle(), icon, thumbnail, lang);
-            work = DAO.put(work);
+            //Check if work exists
+            work = DAO.getExistingWork(author, request.getTitle(), lang);
+            if(work != null)return DAO.getBookFromWork(work, lang);
+            work = getWorkFromRequest(author, request.getTitle(), lang, icon, thumbnail);
         } else {
             author = DAO.get(Author.class, request.getauthorId());
             if(author == null) throw new InvalidParameterException("The author does not exist");
             //Check if the work exists
             if(request.hasNewWork()) {
-                work = new Work(author, request.getTitle(), lang);
-                work = DAO.put(work);
+                work = DAO.getExistingWork(author, request.getTitle(), lang);
+                if(work != null)return DAO.getBookFromWork(work, lang);
+                work = getWorkFromRequest(author, request.getTitle(), lang, icon, thumbnail);
             } else {
                 work = DAO.get(Work.class, request.getWorkId());
                 if(work == null) throw new InvalidParameterException("The work does not exist");
             }
         }
+        //Check if book with same name exists before
+        //If it does return that book
         book = new Book(work, request.getTitle(), icon, thumbnail, lang);
         BookRating rating = new BookRating();
         book.setRating(rating);
         rating.setBook(book);
         book = DAO.put(book);
         //Create bookRequest
-        NewBookRequest requestLog = new NewBookRequest(user, request.getTitle(), request.getAuthorString(), request.getLanguageString());
-        DAO.put(requestLog);
+        //NewBookRequest requestLog = new NewBookRequest(user, request.getTitle(), request.getAuthorString(), request.getLanguageString());
+        //DAO.put(requestLog);
         return book;
     }
     
+    private static Work getWorkFromRequest(Author author, String title, Language lang, String icon, String thumbnail) {
+        Work work = new Work(author, title, icon, thumbnail, lang);
+        work = DAO.put(work);
+        return work;
+    }
+    
     private static Author getAuthorFromString(String name) {
+        Author closestMatch = DAO.getAuthorByName(name);
+        if(closestMatch != null) return closestMatch;
         List<Author> possibleAuthors = SearchServiceImplementation.searchAuthors(name, 0, 3);
-        Author closestMatch = null;
         int closestDistance = name.length();
         for(Author author : possibleAuthors) {
             if(author == null) continue;

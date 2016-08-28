@@ -1,5 +1,7 @@
 package com.pd.api.db;
 
+import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -16,12 +18,16 @@ import com.pd.api.entity.Author;
 import com.pd.api.entity.Book;
 import com.pd.api.entity.BookRating;
 import com.pd.api.entity.Event;
+import com.pd.api.entity.EventWithBook;
+import com.pd.api.entity.EventWithPosdta;
+import com.pd.api.entity.EventWithUser;
 import com.pd.api.entity.Language;
 import com.pd.api.entity.Posdta;
 import com.pd.api.entity.Role;
 import com.pd.api.entity.SocialProvider;
 import com.pd.api.entity.User;
 import com.pd.api.entity.VerificationToken;
+import com.pd.api.entity.Work;
 import com.pd.api.entity.aux.BookInfo;
 import com.pd.api.entity.aux.LibraryView;
 import com.pd.api.security.SocialLogin;
@@ -80,6 +86,7 @@ public class DAO {
         if(tx.isActive()) {
             Object o = em.merge(obj);
             em.flush();
+            tx.commit();
             return(T) o;
         } else {
             tx.begin();
@@ -151,6 +158,10 @@ e2.setSomeField(anotherValue);
     
     public static void flush() {
         getEM().flush();
+    }
+    
+    public static void refresh(Object obj) {
+        getEM().refresh(obj);
     }
     
     public static <T> T remove(Class<T> type, Long id) {
@@ -421,6 +432,35 @@ e2.setSomeField(anotherValue);
         }
     }
     
+    public static Book getBookFromWork(Work work, Language lang) {
+        Query q = createQuery("SELECT obj FROM " + Book.class.getName() + " obj where work = ? and language = ? ", work, lang);
+        List<Object> l = q.getResultList();
+        if(l.isEmpty()) return null;
+        return (Book)l.get(0);
+    }
+    
+    public static Work getExistingWork(Author author, String title, Language lang) {
+        Query q = createQuery("SELECT obj FROM " + Work.class.getName() + " obj where author = ? AND title = ? AND language = ?", author, title, lang);
+        List<Object> l = q.getResultList();
+        if(l.isEmpty()) return null;
+        return (Work)l.get(0);
+    }
+    
+    public static Work getWorkByTitle(String title) {
+        return getFirstByParam(Work.class, "title", title);
+    }
+    
+    public static Author getAuthorByName(String name) {
+        return getFirstByParam(Author.class, "name", name);
+    }
+    
+    public static <T> T getFirstByParam(Class<T> type, String param, String value) {
+        Query q = createQuery("SELECT obj FROM " + type.getName() + " obj where " + param + " = ?", value);
+        List<Object> l = q.getResultList();
+        if(l.isEmpty()) return null;
+        return (T)l.get(0);
+    }
+    
     public static BookRating getBookRating(Long bookId) {
         Book book = get(Book.class, bookId);
         BookRating rating = book.getRating();
@@ -568,4 +608,63 @@ e2.setSomeField(anotherValue);
         Query q = createQuery("select p, v from Posdta as p left outer join p.userVotes as v where p.book = ? AND (v.user = ? OR v.user = null) ", book, user);
         return (List<Object[]>)q.getResultList();
     }
+    
+    //COUNTING
+    
+    public static int getUserFollowerCount(Long userId) {
+        Query query = DAO.createNativeQueryWithParams("select count(*) from followers where user_id = ?", userId);
+        int count = ((BigInteger)query.getSingleResult()).intValue();
+        return count;
+    }
+    
+    public static int getUserFollowingCount(Long userId) {
+        Query query = DAO.createNativeQueryWithParams("select count(*) from followers where follower_id = ?", userId);
+        int count = ((BigInteger)query.getSingleResult()).intValue();
+        return count;
+    }
+    
+    public static int getUserFavoriteCount(Long userId) {
+        Query query = DAO.createNativeQueryWithParams("select count(*) from book_favorited where user_id = ?", userId);
+        int count = ((BigInteger)query.getSingleResult()).intValue();
+        return count;
+    }
+    
+    public static int getUserReadingCount(Long userId) {
+        Query query = DAO.createNativeQueryWithParams("select count(*) from book_reading where user_id = ?", userId);
+        int count = ((BigInteger)query.getSingleResult()).intValue();
+        return count;
+    }
+    
+    public static int getUserWishlistCount(Long userId) {
+        Query query = DAO.createNativeQueryWithParams("select count(*) from book_wishlisted where user_id = ?", userId);
+        int count = ((BigInteger)query.getSingleResult()).intValue();
+        return count;
+    }
+    
+    public static int getUserPosdtaCount(Long userId) {
+        Query query = DAO.createNativeQueryWithParams("select count(*) from posdta where user_id = ?", userId);
+        int count = ((BigInteger)query.getSingleResult()).intValue();
+        return count;
+    }
+    
+    public static void saveEvent(Event e) {
+        DAO.put(e);
+    }
+    
+    public static void saveEventWithBook(EventWithBook e) {
+        Date d = new Date(System.currentTimeMillis() - (24 * 60 * 60 * 1000));
+        Query q = createQuery("SELECT e FROM EventWithUser e where user = ? AND type = ? AND target = ? AND eventDate > ?", e.getUser(), e.getEventType(), e.getBook(), d);
+        if(q.getResultList().isEmpty()) {
+            saveEvent(e);
+        }
+    }
+    
+    public static void saveEventWithUser(EventWithUser e) {
+        Date d = new Date(System.currentTimeMillis() - (24 * 60 * 60 * 1000));
+        Query q = createQuery("SELECT e FROM EventWithUser e where user = ? AND type = ? AND target = ? AND eventDate > ?", e.getUser(), e.getEventType(), e.getTarget(), d);
+        if(q.getResultList().isEmpty()) {
+            saveEvent(e);
+        }
+    }
+    
 }

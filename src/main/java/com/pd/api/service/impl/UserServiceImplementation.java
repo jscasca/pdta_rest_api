@@ -38,15 +38,12 @@ public class UserServiceImplementation {
     public static UserInfo getUserInfo(Long id) {
         User user = DAO.get(User.class, id);
         if(user == null) throw new GeneralException("User not found");
-        
-        List<Book> favorites = DAO.getUserFavorites(id, 0, UserInfo.DEFAULT_LIMIT);
-        List<Book> wishlisted = DAO.getUserWishlisted(id, 0, UserInfo.DEFAULT_LIMIT);
-        List<Book> reading = DAO.getUserReading(id, 0, UserInfo.DEFAULT_LIMIT);
-        List<Posdta> posdtas = DAO.getUserPosdtas(id, 0, UserInfo.DEFAULT_POSDTA_LIMIT);
-        //List<User> followers = getUserFollowers(id, 0, UserInfo.DEFAULT_LIMIT);
-        //List<User> following = getUsersFollowing(id, 0, UserInfo.DEFAULT_LIMIT);
         int followerCount = getUserFollowerCount(id);
         int followingCount = getUserFollowingCount(id);
+        int favorites = DAO.getUserFavoriteCount(id);
+        int reading = DAO.getUserReadingCount(id);
+        int wishlisted = DAO.getUserWishlistCount(id);
+        int posdtas = DAO.getUserPosdtaCount(id);
         UserInfo info = new UserInfo(user, reading, wishlisted, favorites, posdtas, followerCount, followingCount);
         return info;
     }
@@ -63,8 +60,7 @@ public class UserServiceImplementation {
         user.addFollowee(following);
         user = DAO.put(user);
         //Create event
-        EventWithUser followEvent = new EventWithUser(user, Event.EventType.STARTED_FOLLOWING, following);
-        DAO.put(followEvent);
+        DAO.saveEventWithUser(new EventWithUser(user, Event.EventType.STARTED_FOLLOWING, following));
         return following;
     }
     

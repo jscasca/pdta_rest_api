@@ -7,12 +7,16 @@ import com.pd.api.entity.Book;
 import com.pd.api.entity.BookSuggestions;
 import com.pd.api.entity.Credential;
 import com.pd.api.entity.Language;
+import com.pd.api.entity.Posdta;
 import com.pd.api.entity.Role;
 import com.pd.api.entity.SocialProvider;
 import com.pd.api.entity.User;
+import com.pd.api.entity.UserVote;
 import com.pd.api.entity.Work;
 import com.pd.api.entity.aux.MemberRegistration;
+import com.pd.api.entity.aux.PosdtaWrapper;
 import com.pd.api.exception.DuplicateResourceException;
+import com.pd.api.security.AuthTools;
 import com.pd.api.security.SocialLogin;
 import com.pd.api.security.SocialLoginUsername;
 import com.pd.api.service.impl.BookServiceImplementation;
@@ -33,19 +37,18 @@ public class ApplicationTest {
 
     public static void main(String[] args) throws IOException {
         //testFavoritesList();
-        //testSearch();
-        //testMostRead();
-        //testSuggestions();
-        /*
-        SocialProvider provider = DAO.getProviderByName("facebook");
-        
-        Query q = DAO.createQuery("SELECT obj FROM " + SocialLogin.class.getName() + " obj where socialProvider = ?", provider);
-        List<SocialLogin> logins = q.getResultList();
-        for(SocialLogin l : logins) {
-            System.out.println(l.getUserId());
-        }*/
-        User u = testSocialUsername(new SocialLoginUsername("facebook:10156563121645300"));
-        System.out.println(u);
+        Credential c = DAO.get(Credential.class, 1L);
+        c.setPassword(AuthTools.encode("notroot"));
+        DAO.put(c);
+    }
+    
+    public static void savePosdta() {
+        String username = "tin";
+        Long bookId = 1000L;
+        PosdtaWrapper wrapper = new PosdtaWrapper("Random stuff", 1);
+        BookServiceImplementation.savePosdta(username, bookId, wrapper);
+        Book book = DAO.get(Book.class, bookId);
+        System.out.println(book);
     }
     
     public static User testSocialUsername(SocialLoginUsername username) {

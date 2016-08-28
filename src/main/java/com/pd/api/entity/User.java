@@ -95,6 +95,10 @@ public class User implements Serializable {
         following.remove(follower);
     }
     
+    public boolean isFollowing(User f) {
+        return following.contains(f);
+    }
+    
     @Override
     public String toString() {
         return username + ":" + id;
