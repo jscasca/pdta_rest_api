@@ -11,6 +11,7 @@ import com.microtripit.mandrillapp.lutung.view.MandrillMessage;
 import com.microtripit.mandrillapp.lutung.view.MandrillMessage.Recipient;
 import com.microtripit.mandrillapp.lutung.view.MandrillMessageStatus;
 import com.microtripit.mandrillapp.lutung.view.MandrillUserInfo;
+import com.pd.api.entity.Language;
 import com.pd.api.entity.VerificationToken;
 
 public class MandrillMailer implements Mailer{
@@ -39,7 +40,12 @@ public class MandrillMailer implements Mailer{
             e.printStackTrace();
         }
     }
-    
+
+    @Override
+    public void sendVerificationMail(VerificationToken token, Language lang) {
+
+    }
+
     public void sendMail(String[] addresses, String email, String subject) throws MandrillApiError, IOException {sendMail(addresses, email, subject, getDefaultTags(), DEFAULT_FROM_EMAIL, DEFAULT_FROM_NAME);}
     public void sendMail(String[] addresses, String email, String subject, ArrayList<String> tags) throws MandrillApiError, IOException {sendMail(addresses, email, subject, tags, DEFAULT_FROM_EMAIL, DEFAULT_FROM_NAME);}
     public void sendMail(String[] addresses, String email, String subject, ArrayList<String> tags, String fromEmail, String fromName) throws MandrillApiError, IOException {

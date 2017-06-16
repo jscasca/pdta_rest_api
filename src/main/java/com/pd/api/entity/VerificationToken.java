@@ -21,7 +21,7 @@ public class VerificationToken {
         EMAIL_VERIFICATION
     };
     
-    private static final int DEFAULT_EXPIRATION_TIME = 60 * 24; //24 hours
+    private static final int DEFAULT_EXPIRATION_TIME = 60 * 48; //24 hours
     
     public static final int DEFAULT_PASSWORD_RESET = 20;
     
@@ -73,6 +73,6 @@ public class VerificationToken {
     
     public boolean hasExpired() {
         Date tokenTime = new Date(getExpirationDate().getTime());
-        return tokenTime.after(new Date());
+        return tokenTime.before(new Date());
     }
 }
