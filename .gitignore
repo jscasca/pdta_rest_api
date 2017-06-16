@@ -14,3 +14,8 @@ target/
 *.bak
 tmp/
 src/main/resources/config.properties
+
+# IntelliJ stuff #
+##################
+*.iml
+.idea/
