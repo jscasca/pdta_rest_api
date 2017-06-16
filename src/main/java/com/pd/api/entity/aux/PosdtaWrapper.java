@@ -30,10 +30,6 @@ public class PosdtaWrapper {
         this.posdta = posdta;
     }
     
-    public void setRating(int rating) {
-        this.rating = rating;
-    }
-    
     public Posdta getPosdta(BookReading reading) {
         return new Posdta(reading, posdta, rating);
     }
@@ -41,6 +37,12 @@ public class PosdtaWrapper {
     public Posdta getPosdta(User user, Book book) {
         return new Posdta(user, book, posdta, rating);
     }
+
+    public Boolean isRatingOnly() { return rating > 0 && posdta == null; }
+
+    public Boolean isPosdtaOnly() { return rating == 0 && posdta != null; }
+
+    public Boolean isRatingAndPosdta() { return rating > 0 && posdta != null; }
     
     @Override
     public String toString() {

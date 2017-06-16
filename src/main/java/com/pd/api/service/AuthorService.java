@@ -61,7 +61,9 @@ public class AuthorService {
     @RequestMapping(value="/{id:[0-9]+}/works", method = RequestMethod.POST)
     @ResponseBody
     public Work createWork(@RequestBody WorkWrapper workWrapper, @PathVariable("id") final Long id) {
-        return AuthorServiceImplementation.createWork(id, workWrapper);
+        return null;
+        //TODO: implement
+        //return AuthorServiceImplementation.createWork(id, workWrapper);
     }
     
     @RequestMapping(value="/{id:[0-9]+}/books", method = RequestMethod.GET)

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.pd.api.entity.Book;
-import com.pd.api.entity.BookRating;
 import com.pd.api.entity.Posdta;
 
 public class LibraryView {

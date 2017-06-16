@@ -2,6 +2,7 @@ package com.pd.api.security;
 
 import java.util.Set;
 
+import com.pd.api.mail.SparkMailer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
@@ -65,7 +66,7 @@ public class AuthTools {
         if(credential != null) {
             VerificationToken token = new VerificationToken(credential, VerificationType.PASSWORD_RESET, VerificationToken.DEFAULT_PASSWORD_RESET);
             token = DAO.put(token);
-            MandrillMailer mailer = new MandrillMailer();
+            SparkMailer mailer = new SparkMailer();
             mailer.sendVerificationMail(token);
         }
     }
@@ -74,9 +75,9 @@ public class AuthTools {
         VerificationToken token = DAO.getVerificationToken(prf.getToken());
         if(token == null) { throw new InvalidAuthenticationException("Invalid or expired token");}
         if(token.hasExpired()) {throw new InvalidAuthenticationException("Invalid or expired token");}
-        Credential credential = DAO.getUniqueByUsername(Credential.class, prf.getUsername());
+        Credential credential = DAO.getCredentialByEmail(token.getEmail());
         if(credential == null) { throw new InvalidAuthenticationException("Invalid username");}
-        if(!credential.getEmail().equals(token.getEmail())) { throw new InvalidAuthenticationException("This token is not yours");}
+        //if(!credential.getEmail().equals(token.getEmail())) { throw new InvalidAuthenticationException("This token is not yours");}
         credential.setPassword(prf.getPassword());
         DAO.put(credential);
         DAO.delete(token);

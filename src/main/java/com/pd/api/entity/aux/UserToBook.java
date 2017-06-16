@@ -13,7 +13,7 @@ public class UserToBook {
     private boolean wishlisted;
     private boolean favorite;
     private boolean reading;
-    private boolean posdta;
+    private Posdta posdta;
     
     private User user;
     private Book book;
@@ -41,10 +41,10 @@ public class UserToBook {
     }
     
     public boolean hasPosdta() {
-        return posdta;
+        return posdta == null;
     }
     
-    public boolean getPosdta() {
+    public Posdta getPosdta() {
         return posdta;
     }
     
@@ -67,9 +67,7 @@ public class UserToBook {
     }
     
     private void updatePosdta() {
-        Posdta bookPosdta = DAO.getUnique(Posdta.class, "where user = ? and book = ?", user, book);
-        if(bookPosdta != null) posdta = true;
-        else posdta = false;
+        posdta = DAO.getUnique(Posdta.class, "where user = ? and book = ?", user, book);
     }
     
     public String toString() {

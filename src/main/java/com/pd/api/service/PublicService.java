@@ -78,8 +78,6 @@ public class PublicService {
     @RequestMapping(value="/passwordRequest", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void requestPassword(@RequestBody String user) {
-        //String username = user;
-        //System.out.println(username);
         PublicServiceImplementation.requestPasswordReset(user);
     }
     

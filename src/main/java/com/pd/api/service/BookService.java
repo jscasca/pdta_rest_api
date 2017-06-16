@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.pd.api.entity.aux.BookRequestWrapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
@@ -18,11 +19,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.pd.api.entity.Book;
-import com.pd.api.entity.NewBookRequest;
 import com.pd.api.entity.Posdta;
 import com.pd.api.entity.User;
 import com.pd.api.entity.aux.BookInfo;
-import com.pd.api.entity.aux.BookRequestWrapper;
 import com.pd.api.entity.aux.PosdtaWrapper;
 import com.pd.api.entity.aux.UserToBook;
 import com.pd.api.security.CustomUserData;
@@ -188,6 +187,22 @@ public class BookService {
             @PathVariable("id") final Long bookId) {
         BookServiceImplementation.stopReadingBook(userData.getUsername(), bookId);
     }
+
+    /**
+     *
+     * @param userData
+     * @param bookId
+     * @param posdtaWrapper
+     * @return the created posdta
+     */
+    @Secured("ROLE_USER")
+    @RequestMapping(value="/{id:[0-9]+}/posdta", method = RequestMethod.POST)
+    @ResponseBody
+    public Posdta posdta(@ModelAttribute final CustomUserData userData,
+                              @PathVariable("id") final Long bookId,
+                              @RequestBody (required=false) final PosdtaWrapper posdtaWrapper) {
+        return BookServiceImplementation.savePosdta(userData.getUsername(), bookId, posdtaWrapper);
+    }
     
     /**
      * 
@@ -201,7 +216,7 @@ public class BookService {
     @ResponseBody
     public Posdta leavePosdta(@ModelAttribute final CustomUserData userData,
             @PathVariable("id") final Long bookId,
-            @RequestBody final PosdtaWrapper posdtaWrapper) {
+            @RequestBody(required=false) final PosdtaWrapper posdtaWrapper) {
         return BookServiceImplementation.savePosdta(userData.getUsername(), bookId, posdtaWrapper);
     }
     
@@ -222,7 +237,7 @@ public class BookService {
     
     @RequestMapping(value="/{id:[0-9]+}/posdtas/votes", method = RequestMethod.GET)
     @ResponseBody
-    public List<Object[]> posdtasWithUserVote(@ModelAttribute final CustomUserData userData,
+    public List<Posdta> posdtasWithUserVote(@ModelAttribute final CustomUserData userData,
             @PathVariable("id") final Long bookId,
             @RequestParam(value="start", defaultValue="0") final int start,
             @RequestParam(value="limit", defaultValue="10") final int limit) {
@@ -254,21 +269,21 @@ public class BookService {
         return BookServiceImplementation.getBookInfo(bookId);
     }
     
-    //@Secured("ROLE_USER")
+    @Secured("ROLE_USER")
     @RequestMapping(value="/requests", method = RequestMethod.POST)
     @ResponseBody
     public Book requestNewBook(@RequestBody final BookRequestWrapper newRequestWrapper) {
         return BookServiceImplementation.requestNewBook(newRequestWrapper);
     }
     
-    @Secured("ROLE_ADMIN")
+    /*@Secured("ROLE_ADMIN")
     @RequestMapping(value="/requests", method = RequestMethod.GET)
     @ResponseBody
     public List<NewBookRequest> getBookRequests(@ModelAttribute final CustomUserData userData,
             @RequestParam(value="start", defaultValue="0") int first,
             @RequestParam(value="limit", defaultValue="10") int limit) {
         return BookServiceImplementation.getBookRequests(first, limit);
-    }
+    }*/
 
     @Secured("ROLE_USER")
     @RequestMapping(value="/suggestions", method = RequestMethod.GET)

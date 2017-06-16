@@ -1,11 +1,5 @@
 package com.pd.api.entity.aux;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.pd.api.entity.Book;
-import com.pd.api.entity.BookRating;
-import com.pd.api.entity.Posdta;
 import com.pd.api.entity.User;
 
 public class UserInfo {

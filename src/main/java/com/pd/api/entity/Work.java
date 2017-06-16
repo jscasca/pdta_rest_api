@@ -1,13 +1,10 @@
 package com.pd.api.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonManagedReference;
+
+import javax.persistence.*;
+import java.util.Set;
 
 /**
  * 
@@ -26,9 +23,9 @@ public class Work {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id = null;
     
-    @ManyToOne
-    @JoinColumn(name="author_id")
-    private Author author;
+    @ManyToMany(cascade=CascadeType.ALL)
+    @JoinTable(name="author_book", joinColumns=@JoinColumn(name="book_id"), inverseJoinColumns=@JoinColumn(name="author_id"))
+    private Set<Author> authors;
     
     private String title;
     
@@ -46,9 +43,9 @@ public class Work {
     private String className = "Work";
     
     public Work() {}
-    public Work(Author author, String title, Language language) {this(author, title, DEFAULT_ICON, DEFAULT_THUMBNAIL, language);}
-    public Work(Author author, String title, String icon, String thumbnail, Language language) {
-        this.author = author;
+    public Work(Set<Author> authors, String title, Language language) {this(authors, title, DEFAULT_ICON, DEFAULT_THUMBNAIL, language);}
+    public Work(Set<Author> authors, String title, String icon, String thumbnail, Language language) {
+        this.authors = authors;
         this.title = title;
         this.icon = icon;
         this.thumbnail = thumbnail;
@@ -59,9 +56,18 @@ public class Work {
     public Long getId() {
         return id;
     }
-    
-    public Author getAuthor() {
-        return author;
+
+    public Set<Author> getAuthors() {
+        return authors;
+    }
+
+    public String getAuthorsNames() {
+        StringBuilder sb = new StringBuilder();
+        for(Author author : this.authors) {
+            sb.append(author.getName());
+            sb.append(" ");
+        }
+        return sb.toString();
     }
     
     public String getTitle() {
@@ -84,8 +90,8 @@ public class Work {
         return language;
     }
     
-    public void setAuthor(Author author) {
-        this.author = author;
+    public void setAuthors(Set<Author> authors) {
+        this.authors = authors;
     }
     
     public void setTitle(String title) {
@@ -106,11 +112,6 @@ public class Work {
     
     public Book createBook() {
         return new Book(this);
-    }
-    
-    public void updateRating(WorkRating wr) {
-        //TODO: implement
-        this.rating = wr.getAverage();
     }
     
     @Override

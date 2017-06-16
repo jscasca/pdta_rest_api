@@ -1,42 +1,22 @@
 package com.pd.api.service.impl;
 
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
+import com.pd.api.entity.*;
+import com.pd.api.entity.aux.*;
+import com.pd.api.exception.DuplicateResourceException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.pd.api.db.DAO;
-import com.pd.api.entity.Author;
-import com.pd.api.entity.Book;
-import com.pd.api.entity.BookFavorited;
-import com.pd.api.entity.BookRating;
-import com.pd.api.entity.BookReading;
-import com.pd.api.entity.BookSuggestions;
-import com.pd.api.entity.BookWishlisted;
-import com.pd.api.entity.Event;
-import com.pd.api.entity.EventWithBook;
-import com.pd.api.entity.EventWithPosdta;
-import com.pd.api.entity.Language;
-import com.pd.api.entity.NewBookRequest;
-import com.pd.api.entity.Posdta;
-import com.pd.api.entity.PosdtaVoting;
-import com.pd.api.entity.User;
-import com.pd.api.entity.Work;
-import com.pd.api.entity.WorkRating;
-import com.pd.api.entity.aux.BookInfo;
-import com.pd.api.entity.aux.BookRequestWrapper;
-import com.pd.api.entity.aux.PosdtaWrapper;
-import com.pd.api.entity.aux.UserToBook;
 import com.pd.api.exception.InvalidParameterException;
 import com.pd.api.exception.InvalidStateException;
-import com.pd.api.util.LuceneIndexer;
 
 public class BookServiceImplementation {
 
-    static final Logger LOG = LoggerFactory.getLogger(BookServiceImplementation.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BookServiceImplementation.class);
     
     public static List<Book> getBooks(int start, int limit) {
         return DAO.getAll(Book.class, start, limit);
@@ -44,8 +24,8 @@ public class BookServiceImplementation {
     
     /**
      * 
-     * @param start
-     * @param limit
+     * @param start the first element to return
+     * @param limit the max number of elements
      * @return A list of the most read books
      */
     public static List<Book> getMostRead(int start, int limit) {
@@ -57,10 +37,12 @@ public class BookServiceImplementation {
         //TODO: fix this method
         return DAO.getAllBooksFromQuery("SELECT distinct p.book from Posdta p group by p.book.id order by count(*) desc", start, limit);
     }
-    
+
+    //TODO: rework this method
     public static List<Book> getBooksWithTheSameAuthor(Long id, int start, int limit) {
-        Book b = DAO.get(Book.class, id);
-        return DAO.getAllBooksFromQuery("SELECT distinct b from Book b where b.work.author = ? and b.work <> ?", start, limit, b.getAuthor(), b.getWork());
+        return new ArrayList<Book>();
+        //Book b = DAO.get(Book.class, id);
+        //return DAO.getAllBooksFromQuery("SELECT distinct b from Book b where b.work.author = ? and b.work <> ?", start, limit, b.getAuthors(), b.getWork());
     }
     
     public static Book getBookById(Long id) {
@@ -68,26 +50,14 @@ public class BookServiceImplementation {
     }
     
     public static BookInfo getBookInfo(Long id) {
-        BookInfo info = DAO.getBookInfo(id);
-        return info;
-    }
-    
-    public static WorkRating getBookDetailedRating(Long bookId) {
-        Book book = DAO.get(Book.class, bookId);
-        WorkRating wr = DAO.getUnique(WorkRating.class, "where work = ?", book.getWork());
-        if(wr == null) {
-            wr = new WorkRating(book.getWork());
-            DAO.put(wr);
-        }
-        return wr;
-        
+        return DAO.getBookInfo(id);
     }
     
     /**
      * 
-     * @param bookId
-     * @param start
-     * @param limit
+     * @param bookId the book id
+     * @param start the row to start from
+     * @param limit the limit of results
      * @return List of users that marked this book as a favorite
      */
     public static List<User> getBookFavorites(Long bookId, int start, int limit) {
@@ -97,9 +67,9 @@ public class BookServiceImplementation {
     
     /**
      * 
-     * @param bookId
-     * @param start
-     * @param limit
+     * @param bookId the book id
+     * @param start the row to start returning results from
+     * @param limit the max number of elements to return
      * @return List of users that have this book on their wish list
      */
     public static List<User> getBookWishlists(Long bookId, int start, int limit) {
@@ -107,10 +77,10 @@ public class BookServiceImplementation {
     }
     
     /**
-     * 
-     * @param bookId
-     * @param start
-     * @param limit
+     *
+     * @param bookId the book id
+     * @param start the row to start returning results from
+     * @param limit the max number of elements to return
      * @return List of users that are currently reading this book
      */
     public static List<User> getBookReading(Long bookId, int start, int limit) {
@@ -118,20 +88,26 @@ public class BookServiceImplementation {
     }
     
     /**
-     * 
-     * @param bookId
-     * @param start
-     * @param limit
+     *
+     * @param bookId the book id
+     * @param start the row to start returning results from
+     * @param limit the max number of elements to return
      * @return List of Posdtas for a particular book
      */
     public static List<Posdta> getBookPosdtas(Long bookId, int start, int limit) {
-        return DAO.getAll(Posdta.class, "where book.id = ?", "", start, limit, bookId);
+        return DAO.getAll(Posdta.class, "where book.id = ? and posdta is not null", "", start, limit, bookId);
     }
     
-    public static List<Object[]> getBookPosdtasWithUserVotes(String username, Long bookId, int start, int limit) {
+    public static List<Posdta> getBookPosdtasWithUserVotes(String username, Long bookId, int start, int limit) {
         User user = DAO.getUserByUsername(username);
         Book book = DAO.get(Book.class, bookId);
-        return DAO.getPosdtasWithVotesByBook(user, book, start, limit);
+        List<Posdta> posdtas = DAO.getAll(Posdta.class, "where book.id = ?", "", start, limit, bookId);
+        for(int i = 0; i < posdtas.size(); i++) {
+            Posdta posdta = posdtas.get(i);
+            UserVote vote = DAO.getUnique(UserVote.class, "where user = ? and posdta = ?", user, posdta);
+            if(vote != null) posdtas.set(i, new PosdtaWithVote(vote));
+        }
+        return posdtas;
     }
     
     //get reading by book
@@ -139,8 +115,8 @@ public class BookServiceImplementation {
     /**
      * Action: mark a book as being read by the user
      * if the book was in the user wish list remove it (since he already has it)
-     * @param username
-     * @param bookId
+     * @param username the username of the user executing this action
+     * @param bookId the target book id
      */
     public static void startReadingBook(String username, Long bookId) {
         User user = DAO.getUserByUsername(username);
@@ -157,8 +133,6 @@ public class BookServiceImplementation {
         reading = DAO.put(reading);
         LOG.debug("Reading is saved");
         //Update book reading info
-        BookRating rating = book.getRating();
-        rating.addReading();
         book = DAO.put(book);
         LOG.debug("Book metrics are updated");
         //Check if it was wish listed and remove
@@ -171,8 +145,8 @@ public class BookServiceImplementation {
     /**
      * Action: stop reading a book
      * You can only stop reading a book after you left a Posdta
-     * @param username
-     * @param bookId
+     * @param username the username of the user executing this action
+     * @param bookId the target book id
      */
     public static void stopReadingBook(String username, Long bookId) {
         User user = DAO.getUserByUsername(username);
@@ -186,20 +160,54 @@ public class BookServiceImplementation {
         */
         //TODO: implement the event now delete the reading
         DAO.remove(reading.getClass(), reading.getId());
-        BookRating rating = book.getRating();
-        rating.removeReading();
         DAO.put(book);
     }
     
     /**
      * Action save a Posdta
-     * @param username
-     * @param bookId
-     * @param posdtaWrapper
+     * @param username the username of the user executing this action
+     * @param bookId the target book id
+     * @param posdtaWrapper the elements of the posdta (prologe)
      * @return the created posdta
      */
+    //TODO: REDEFINE
     public static Posdta savePosdta(String username, Long bookId, PosdtaWrapper posdtaWrapper) {
+        if(posdtaWrapper == null) { throw new NullPointerException(""); }
+        Book book = DAO.get(Book.class, bookId);
         User user = DAO.getUserByUsername(username);
+        Posdta posdta = DAO.getUnique(Posdta.class, "where user = ? and book = ? ", user, book); //Check if there was a Posdta already
+        BookReading reading = DAO.getUnique(BookReading.class, "where user = ? and book = ?", user, book);
+        boolean triggerEvent = false;
+        //Complete
+        if(posdtaWrapper.isRatingAndPosdta()) {
+            if(posdta != null) throw new DuplicateResourceException("A posdta already exists for this book");
+            if(reading != null) posdta = new Posdta(reading, posdtaWrapper.getPosdta(), posdtaWrapper.getRating());
+            else posdta = new Posdta(user, book, posdtaWrapper.getPosdta(), posdtaWrapper.getRating());
+            triggerEvent = true;
+        } else if(posdtaWrapper.isPosdtaOnly()) {
+            if(posdta == null) throw new InvalidStateException("This posdta does not have a rating");
+            if(posdta.getPosdta() != null) throw new DuplicateResourceException("This posdta already exists");
+            posdta.setPosdta(posdtaWrapper.getPosdta());
+            triggerEvent = true;
+        } else if(posdtaWrapper.isRatingOnly()) {
+            if(posdta != null && posdta.getRating() > 0) throw new DuplicateResourceException("A rating already exist for this book");
+            if(reading != null) posdta = new Posdta(reading, posdtaWrapper.getRating());
+            else posdta = new Posdta(user, book, null, posdtaWrapper.getRating());
+        }
+        posdta = DAO.put(posdta);
+        if(triggerEvent) {
+            EventWithPosdta posdtaEvent = new EventWithPosdta(user, Event.EventType.POSDTA, posdta);
+            DAO.put(posdtaEvent);
+        }
+        if(reading != null) {
+            DAO.remove(reading.getClass(), reading.getId());
+        }
+        BookWishlisted wishlisted = DAO.getUnique(BookWishlisted.class, "where user = ? and book = ?", user, book);
+        if(wishlisted != null) {
+            DAO.remove(wishlisted.getClass(), wishlisted.getId());
+        }
+        return posdta;
+        /*User user = DAO.getUserByUsername(username);
         Book book = DAO.get(Book.class, bookId);
         
         Posdta posdta = DAO.getUnique(Posdta.class, "where user = ? and book = ? ", user, book); //Check if there was a Posdta already
@@ -211,41 +219,24 @@ public class BookServiceImplementation {
         } else {
             posdta = posdtaWrapper.getPosdta(user, book);
         }
-        PosdtaVoting votes = new PosdtaVoting();
-        posdta.setVotes(votes);
-        votes.setPosdta(posdta);
         posdta = DAO.put(posdta);
-        
-        WorkRating wr = DAO.getUnique(WorkRating.class, "where work = ?", book.getWork());
-        if(wr == null) wr = new WorkRating(book.getWork());
-        wr.updateCounter(posdtaWrapper.getRating());
-        wr = DAO.put(wr);
-        Work work = book.getWork();
-        work.updateRating(wr);
-        work = DAO.put(work);
-        
-        book.getRating().addRating(posdta.getRating());
-        book = DAO.put(book);
         if(reading != null) {
-            book.getRating().removeReading();
             DAO.remove(reading.getClass(), reading.getId());
         }
         BookWishlisted wishlisted = DAO.getUnique(BookWishlisted.class, "where user = ? and book = ?", user, book);
         if(wishlisted != null) {
-            book.getRating().removeWishlisted();
             DAO.remove(wishlisted.getClass(), wishlisted.getId());
         }
-        book = DAO.put(book);
         
         EventWithPosdta posdtaEvent = new EventWithPosdta(user, Event.EventType.POSDTA, posdta);
         DAO.put(posdtaEvent);
-        return posdta;
+        return posdta;*/
     }
     
     /**
      * Action: mark a book as a favorite for the user
-     * @param username
-     * @param bookId
+     * @param username the username of the user executing this action
+     * @param bookId the target book id
      */
     public static void favoriteBook(String username, Long bookId) {
         User user = DAO.getUserByUsername(username);
@@ -254,15 +245,14 @@ public class BookServiceImplementation {
         if(favorited != null) return;
         favorited = new BookFavorited(user, book);
         favorited = DAO.put(favorited);
-        book.getRating().addFavorited();
         book = DAO.put(book);
         DAO.saveEventWithBook(new EventWithBook(user, Event.EventType.FAVORITED, book));
     }
     
     /**
      * Action: remove book from user favorites
-     * @param username
-     * @param bookId
+     * @param username the username of the user executing this action
+     * @param bookId the target book id
      */
     public static void unfavoriteBook(String username, Long bookId) {
         User user = DAO.getUserByUsername(username);
@@ -270,16 +260,14 @@ public class BookServiceImplementation {
         BookFavorited favorited = DAO.getUnique(BookFavorited.class, " where user = ? and book = ?", user, book);
         if(favorited != null) {
             DAO.delete(favorited);
-            BookRating rating = book.getRating();
-            rating.removeFavorited();
             book = DAO.put(book);
         }
     }
     
     /**
      * Action: insert a book in the users wish list
-     * @param username
-     * @param bookId
+     * @param username the username of the user executing this action
+     * @param bookId the target book id
      */
     public static void wishlistBook(String username, Long bookId) {
         User user = DAO.getUserByUsername(username);
@@ -288,15 +276,14 @@ public class BookServiceImplementation {
         if(wishlisted != null)return;
         wishlisted = new BookWishlisted(user, book);
         wishlisted = DAO.put(wishlisted);
-        book.getRating().addWishlisted();
         DAO.put(book);
         DAO.saveEventWithBook(new EventWithBook(user, Event.EventType.WISHLISTED, book));
     }
     
     /**
      * Action: remove a book from the user's wishlist
-     * @param username
-     * @param bookId
+     * @param username the username of the user executing this action
+     * @param bookId the target book id
      */
     public static void unwishlistBook(String username, Long bookId) {
         User user = DAO.getUserByUsername(username);
@@ -308,17 +295,15 @@ public class BookServiceImplementation {
         BookWishlisted wishlisted = DAO.getUnique(BookWishlisted.class, " where user = ? and book = ?", user, book);
         if(wishlisted != null) {
             DAO.delete(wishlisted);
-            BookRating rating = book.getRating();
-            rating.removeWishlisted();
             book = DAO.put(book);
         }
     }
     
     /**
-     * 
-     * @param username
-     * @param bookId
-     * @return
+     *
+     * @param username the username of the user executing this action
+     * @param bookId the target book id
+     * @return the interactions recorded for the username and the target book
      */
     public static UserToBook getUserToBookInteraction(String username, Long bookId) {
         User user = DAO.getUserByUsername(username);
@@ -329,56 +314,41 @@ public class BookServiceImplementation {
     
     /**
      * Request for a new book to be inserted
-     * @param username
-     * @param newRequestWrapper
+     * @param request the wrapper with the elements of the requested book
      * @return the book created
      */
     public static Book requestNewBook(BookRequestWrapper request) {
-    //public static Book requestNewBook(String username, BookRequestWrapper request) {
-        //User user = DAO.getUserByUsername(username);
-        Work work = null;
-        Book book = null;
-        Author author = null;
         Language lang = DAO.getLanguageByCode(request.getLanguageString());
         if(lang == null) throw new InvalidParameterException("Invalid language");
         String icon = request.getIcon();
         String thumbnail = request.getThumbnail();
-        if(request.hasNewAuthor()) {
-            author = getAuthorFromString(request.getAuthorString());
-            //Check if work exists
-            work = DAO.getExistingWork(author, request.getTitle(), lang);
-            if(work != null)return DAO.getBookFromWork(work, lang);
-            work = getWorkFromRequest(author, request.getTitle(), lang, icon, thumbnail);
-        } else {
-            author = DAO.get(Author.class, request.getauthorId());
-            if(author == null) throw new InvalidParameterException("The author does not exist");
-            //Check if the work exists
-            if(request.hasNewWork()) {
-                work = DAO.getExistingWork(author, request.getTitle(), lang);
-                if(work != null)return DAO.getBookFromWork(work, lang);
-                work = getWorkFromRequest(author, request.getTitle(), lang, icon, thumbnail);
-            } else {
-                work = DAO.get(Work.class, request.getWorkId());
-                if(work == null) throw new InvalidParameterException("The work does not exist");
+        List<Work> existing = DAO.getExistingWorks(request.getTitle(), lang);
+        String[] authorNames = request.getAuthors();
+        //Not convinced about this...
+        for(Work w : existing) {
+            for(String authorName : authorNames) {
+                for(Author author : w.getAuthors()) {
+                    if(author.getName().equals(authorName)) {
+                        return DAO.getBookFromWork(w, lang);
+                    }
+                }
             }
         }
-        //Check if book with same name exists before
-        //If it does return that book
-        book = new Book(work, request.getTitle(), icon, thumbnail, lang);
-        BookRating rating = new BookRating();
-        book.setRating(rating);
-        rating.setBook(book);
+        //Loop authors
+        Set<Author> authors = new HashSet<>();
+        for(String authorName : authorNames) {
+            //Look for each author or add them
+            Author author = getAuthorFromString(authorName);
+            authors.add(author);
+        }
+        Work work = new Work(authors, request.getTitle(), icon, thumbnail, lang);
+        work = DAO.put(work);
+        Book book = new Book(work, request.getTitle(), icon, thumbnail, lang);
         book = DAO.put(book);
         //Create bookRequest
         //NewBookRequest requestLog = new NewBookRequest(user, request.getTitle(), request.getAuthorString(), request.getLanguageString());
         //DAO.put(requestLog);
         return book;
-    }
-    
-    private static Work getWorkFromRequest(Author author, String title, Language lang, String icon, String thumbnail) {
-        Work work = new Work(author, title, icon, thumbnail, lang);
-        work = DAO.put(work);
-        return work;
     }
     
     private static Author getAuthorFromString(String name) {
@@ -400,10 +370,6 @@ public class BookServiceImplementation {
             Author newAuthor = new Author(name);
             return DAO.put(newAuthor);
         }
-    }
-    
-    public static List<NewBookRequest> getBookRequests(int first, int limit) {
-        return DAO.getAll(NewBookRequest.class, first, limit);
     }
     
     public static List<Book> getRandomSuggestions(String username, int limit) {

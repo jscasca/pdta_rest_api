@@ -22,7 +22,7 @@ public class PosdtaServiceImplementation {
         //return DAO.getAll(Author.class, first, limit);
     }
     
-    public static PosdtaVoting upvotePosdta(String username, Long posdtaId) {
+    public static void upvotePosdta(String username, Long posdtaId) {
         User user = DAO.getUserByUsername(username);
         Posdta posdta =DAO.get(Posdta.class, posdtaId);
         UserVote vote = DAO.getUnique(UserVote.class, "where user = ? and posdta = ?", user, posdta);
@@ -32,15 +32,11 @@ public class PosdtaServiceImplementation {
             } else {
                 //convert vote
                 vote.makeUpvote();
-                posdta.getVotes().changeToUpvote();
             }
         } else {
             vote = new UserVote(user, posdta, true);
-            posdta.getVotes().upvote();
         }
         DAO.put(vote);
-        posdta = DAO.put(posdta);
-        return posdta.getVotes();
     }
     
     public static void removeUpvote(String username, Long posdtaId) {
@@ -56,7 +52,7 @@ public class PosdtaServiceImplementation {
         DAO.delete(vote);
     }
     
-    public static PosdtaVoting downvotePosdta(String username, Long posdtaId) {
+    public static void downvotePosdta(String username, Long posdtaId) {
         User user = DAO.getUserByUsername(username);
         Posdta posdta =DAO.get(Posdta.class, posdtaId);
         UserVote vote = DAO.getUnique(UserVote.class, "where user = ? and posdta = ?", user, posdta);
@@ -66,14 +62,10 @@ public class PosdtaServiceImplementation {
             } else {
                 //convert vote
                 vote.makeDownvote();
-                posdta.getVotes().changeToDownvote();
             }
         } else {
             vote = new UserVote(user, posdta, false);
-            posdta.getVotes().downvote();
         }
         DAO.put(vote);
-        posdta = DAO.put(posdta);
-        return posdta.getVotes();
     }
 }
