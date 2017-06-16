@@ -13,11 +13,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Type;
 
 @Entity
@@ -26,41 +25,40 @@ public class Posdta {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id = null;
+    protected Long id = null;
     
     @ManyToOne
     @JoinColumn(name="user_id")
-    private User user;
+    protected User user;
     
     @ManyToOne
     @JoinColumn(name="work_id")
-    private Work work;
+    protected Work work;
     
     @ManyToOne
     @JoinColumn(name="book_id")
-    private Book book;
+    protected Book book;
     
     @Type(type="timestamp")
-    private Date start = new Date();
+    protected Date start = new Date();
     
     @Type(type="timestamp")
-    private Date finish = new Date();
+    protected Date finish = new Date();
     
-    private String posdta;
+    protected String posdta = null;
     
-    private int rating;
-    
-    @OneToOne(mappedBy="posdta", cascade=CascadeType.ALL, fetch=FetchType.EAGER)
-    private PosdtaVoting votes;
-    
-    @OneToMany(fetch = FetchType.LAZY, cascade={CascadeType.ALL})
-    @JoinColumn(name="posdta_id")
-    private Set<UserVote> userVotes;
+    protected int rating;
+
+    @Formula("(SELECT COUNT(*) FROM user_vote v WHERE v.posdta_id = id)")
+    protected int votes;
     
     @Transient
-    private String className = "Posdta";
+    protected String className = "Posdta";
     
     public Posdta() {}
+    public Posdta(BookReading reading, int rating) {
+        this(reading, null, rating);
+    }
     public Posdta(BookReading reading, String posdta, int rating) {
         this(reading.getUser(), reading.getWork(), reading.getBook(), reading.getCreationDate(), posdta, rating);
     }
@@ -71,8 +69,6 @@ public class Posdta {
         this.start = start;
         this.posdta = posdta;
         this.rating = rating;
-        this.votes = new PosdtaVoting();
-        this.userVotes = new HashSet<UserVote>();
     }
     public Posdta(User user, Book book, String posdta, int rating) {
         this.user = user;
@@ -80,8 +76,10 @@ public class Posdta {
         this.book = book;
         this.posdta = posdta;
         this.rating = rating;
-        this.votes = new PosdtaVoting();
-        this.userVotes = new HashSet<UserVote>();
+    }
+
+    public void setPosdta(String posdta) {
+        this.posdta = posdta;
     }
     
     public Long getId() {
@@ -115,32 +113,23 @@ public class Posdta {
     public int getRating() {
         return rating;
     }
-    
-    public PosdtaVoting getVotes() {
+
+    public String getClassName() {
+        return className;
+    }
+
+    public int getVotes() {
         return votes;
     }
-    
-    public void setVotes(PosdtaVoting votes) {
-        this.votes = votes;
+
+    /*public int getUpvotes() {
+        return upvotes;
     }
-    
-    public void addVote(UserVote vote) {
-        this.userVotes.add(vote);
-        if(vote.isUpvote()) {
-            this.votes.upvote();
-        } else {
-            this.votes.downvote();
-        }
-    }
-    
-    public void removeVote(UserVote vote) {
-        this.userVotes.remove(vote);
-        if(vote.isUpvote()) {
-            this.votes.removeUpvote();
-        } else {
-            this.votes.removeDownvote();
-        }
-    }
+
+    public int getDownvotes() {
+        return downvotes;
+    }*/
+
     
     @Override
     public String toString() {

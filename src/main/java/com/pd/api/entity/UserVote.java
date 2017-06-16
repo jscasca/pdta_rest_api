@@ -52,6 +52,10 @@ public class UserVote {
     public boolean isDownvote(){
         return vote == false;
     }
+
+    public Posdta getPosdta() {
+        return posdta;
+    }
     
     public boolean getVote() {
         return vote;
