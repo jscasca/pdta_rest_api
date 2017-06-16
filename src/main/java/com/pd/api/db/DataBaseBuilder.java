@@ -10,7 +10,6 @@ import antlr.debug.Event;
 import com.pd.api.entity.Author;
 import com.pd.api.entity.Book;
 import com.pd.api.entity.BookFavorited;
-import com.pd.api.entity.BookRating;
 import com.pd.api.entity.BookReading;
 import com.pd.api.entity.BookSuggestions;
 import com.pd.api.entity.BookWishlisted;
@@ -19,7 +18,6 @@ import com.pd.api.entity.EventWithBook;
 import com.pd.api.entity.EventWithPosdta;
 import com.pd.api.entity.EventWithUser;
 import com.pd.api.entity.Language;
-import com.pd.api.entity.NewBookRequest;
 import com.pd.api.entity.Posdta;
 import com.pd.api.entity.PosdtaVoting;
 import com.pd.api.entity.Role;
@@ -30,7 +28,6 @@ import com.pd.api.entity.UserRecommendations;
 import com.pd.api.entity.UserVote;
 import com.pd.api.entity.VerificationToken;
 import com.pd.api.entity.Work;
-import com.pd.api.entity.WorkRating;
 import com.pd.api.security.SocialLogin;
 import com.pd.api.db.indexer.*;
 
@@ -49,7 +46,6 @@ public class DataBaseBuilder {
         ac.addAnnotatedClass(BookFavorited.class);
         ac.addAnnotatedClass(BookReading.class);
         ac.addAnnotatedClass(BookWishlisted.class);
-        ac.addAnnotatedClass(BookRating.class);
         ac.addAnnotatedClass(BookSuggestions.class);
         ac.addAnnotatedClass(Credential.class);
         ac.addAnnotatedClass(Event.class);
@@ -57,7 +53,6 @@ public class DataBaseBuilder {
         ac.addAnnotatedClass(EventWithUser.class);
         ac.addAnnotatedClass(EventWithPosdta.class);
         ac.addAnnotatedClass(Language.class);
-        ac.addAnnotatedClass(NewBookRequest.class);
         ac.addAnnotatedClass(Posdta.class);
         ac.addAnnotatedClass(PosdtaVoting.class);
         ac.addAnnotatedClass(Role.class);
@@ -66,7 +61,6 @@ public class DataBaseBuilder {
         ac.addAnnotatedClass(UserVote.class);
         ac.addAnnotatedClass(VerificationToken.class);
         ac.addAnnotatedClass(Work.class);
-        ac.addAnnotatedClass(WorkRating.class);
         
         ac.addAnnotatedClass(UserRecommendations.class);
         

@@ -91,7 +91,7 @@ public class LuceneCronIndexer {
     private Document getDocumentFromBook(Book book) {
         Document doc = new Document();
         doc.add(new TextField("name", book.getTitle(), Field.Store.YES));
-        doc.add(new TextField("author", book.getWork().getAuthor().getName().toString(), Field.Store.YES));
+        doc.add(new TextField("authors", book.getWork().getAuthorsNames(), Field.Store.YES));
         doc.add(new StringField("lang", book.getLanguage().getCode(), Field.Store.YES));
         doc.add(new LongField("id", book.getId(), Field.Store.YES));
         doc.add(new StringField("type", BOOK_TYPE, Field.Store.YES));

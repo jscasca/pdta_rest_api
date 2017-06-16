@@ -10,24 +10,11 @@ import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
 
+import com.pd.api.entity.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.pd.api.db.indexer.AuthorIndex;
 import com.pd.api.db.indexer.BookIndex;
-import com.pd.api.entity.Author;
-import com.pd.api.entity.Book;
-import com.pd.api.entity.BookRating;
-import com.pd.api.entity.Event;
-import com.pd.api.entity.EventWithBook;
-import com.pd.api.entity.EventWithPosdta;
-import com.pd.api.entity.EventWithUser;
-import com.pd.api.entity.Language;
-import com.pd.api.entity.Posdta;
-import com.pd.api.entity.Role;
-import com.pd.api.entity.SocialProvider;
-import com.pd.api.entity.User;
-import com.pd.api.entity.VerificationToken;
-import com.pd.api.entity.Work;
 import com.pd.api.entity.aux.BookInfo;
 import com.pd.api.entity.aux.LibraryView;
 import com.pd.api.security.SocialLogin;
@@ -92,10 +79,18 @@ public class DAO {
             tx.begin();
             Object o = em.merge(obj);
             em.flush();
+            em.refresh(o);
             tx.commit();
             return (T) o;
         }
     }
+
+    /*public static <T> T putAndRefresh(T obj) {
+        EntityManager em = getEM();
+        Object o = em.merge(obj);
+        em.refresh(obj);
+        return (T)o;
+    }*/
     
     
     /**
@@ -337,6 +332,14 @@ e2.setSomeField(anotherValue);
         Query q = createQuery("Select c from Credential c where email = ?", email);
         return exists(q);
     }
+
+    public static Credential getCredentialByEmail(String email) {
+        Query q = createQuery("Select c from Credential c where email = ?", email);
+        try{ return (Credential)q.getSingleResult(); }
+        catch(Exception e) {
+            return null;
+        }
+    }
     
     /**
      * Return true is the query executed has one or more elements matched
@@ -411,11 +414,24 @@ e2.setSomeField(anotherValue);
             return null;
         }
     }
+
+    public static User getUserByEmail(String email) {
+        Query q = createQuery("Select obj.user from Credential obj where obj.email = ?", email);
+        try {
+            return (User)q.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
     
     public static User getUserByUsername(String username) {
         if(SocialLogin.isSocialCredential(username)) {
             return getUserBySocialLogin(new SocialLoginUsername(username));
         }
+        if(Credential.isValidEmail(username)) {
+            return getUserByEmail(username);
+        }
+        //TODO: catch if it is by email
         return getUniqueByUsername(User.class, username);
     }
     
@@ -445,6 +461,12 @@ e2.setSomeField(anotherValue);
         if(l.isEmpty()) return null;
         return (Work)l.get(0);
     }
+
+    //TODO: update this to, additionally, take a set of authors
+    public static List<Work> getExistingWorks(String title, Language lang) {
+        Query q = createQuery("SELECT obj FROM " + Work.class.getName() + " obj WHERE title = ? AND language = ?", title, lang );
+        return  (List<Work>) q.getResultList();
+    }
     
     public static Work getWorkByTitle(String title) {
         return getFirstByParam(Work.class, "title", title);
@@ -460,45 +482,7 @@ e2.setSomeField(anotherValue);
         if(l.isEmpty()) return null;
         return (T)l.get(0);
     }
-    
-    public static BookRating getBookRating(Long bookId) {
-        Book book = get(Book.class, bookId);
-        BookRating rating = book.getRating();
-        if(rating == null) {
-            rating = new BookRating();
-            rating.setBook(book);
-            rating = DAO.put(rating);
-            book.setRating(rating);
-            book = DAO.put(book);
-        }
-        return rating;
-        /*BookRating rating = DAO.get(BookRating.class, bookId);
-        if(rating == null) {
-            //Create a new rating and save it
-            Book book = get(Book.class, bookId);
-            if(book == null) {
-                return null;
-            }
-            rating = new BookRating(book);
-            //Maybe try to update here?
-            rating = put(rating);
-            book.setRating(rating);
-            book = put(book);
-        }
-        return rating;*/
-    }
-    
-    public static BookRating getBookRating(Book book) {
-        BookRating rating = book.getRating();
-        if(rating == null) {
-            rating = new BookRating();
-            book.setRating(rating);
-            rating.setBook(book);
-            book = put(book);
-        }
-        return rating;
-    }
-    
+
     public static LibraryView getUserLibraryView(User user) { return getUserLibraryView(user.getId()); }
     public static LibraryView getUserLibraryView(Long userId) {
         LibraryView lv = new LibraryView();
@@ -537,8 +521,7 @@ e2.setSomeField(anotherValue);
     //TODO: fix this method 
     public static BookInfo getBookInfo(Long bookId) {
         Book book = get(Book.class, bookId);
-        BookRating rating = book.getRating();
-        BookInfo info = new BookInfo(rating, book);
+        BookInfo info = new BookInfo(book);
         return info;
     }
     
@@ -602,11 +585,6 @@ e2.setSomeField(anotherValue);
         } catch(Exception e) {
             return null;
         }
-    }
-    
-    public static List<Object[]> getPosdtasWithVotesByBook(User user, Book book, int start, int limit) {
-        Query q = createQuery("select p, v from Posdta as p left outer join p.userVotes as v where p.book = ? AND (v.user = ? OR v.user = null) ", book, user);
-        return (List<Object[]>)q.getResultList();
     }
     
     //COUNTING

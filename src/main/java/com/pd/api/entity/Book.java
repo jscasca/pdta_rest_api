@@ -1,5 +1,7 @@
 package com.pd.api.entity;
 
+import org.hibernate.annotations.Formula;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -11,6 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import java.util.Set;
 
 /**
  * Books are the main writing of an author
@@ -30,9 +33,6 @@ public class Book {
     @JoinColumn(name="work_id")
     private Work work;
     
-    @OneToOne(mappedBy = "book", cascade=CascadeType.ALL, fetch=FetchType.EAGER)
-    private BookRating rating;
-    
     private String title;
     
     private String icon;
@@ -42,6 +42,9 @@ public class Book {
     @ManyToOne
     @JoinColumn(name="language_id")
     private Language language;
+
+    @Formula("(SELECT AVG(p.rating) FROM posdta p WHERE p.book_id = id)")
+    private Double rating;
     
     @Transient
     private String className = "Book";
@@ -76,20 +79,26 @@ public class Book {
     public Long getId() {
         return id;
     }
+
+    public Double getRating() {
+        return this.rating;
+    }
+
+    public Set<Author> getAuthors() {
+        return this.work.getAuthors();
+    }
     
-    public Author getAuthor() {
+    /*public Author getAuthor() {
         return this.work.getAuthor();
     }
     
     public String getAuthorName() {
         return this.work.getAuthor().getName().toString();
-    }
+    }*/
     
     public Language getLanguage() {
         return language;
     }
-    
-    public BookRating getRating() { return rating;}
     
     public String getClassName() { return className;}
     
@@ -111,10 +120,6 @@ public class Book {
     
     public void setLanguage(Language language) {
         this.language = language;
-    }
-    
-    public void setRating(BookRating rating) {
-        this.rating = rating;
     }
     
     @Override
