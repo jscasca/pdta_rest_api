@@ -4,6 +4,7 @@ import com.pd.api.entity.Book;
 import com.pd.api.entity.BookReading;
 import com.pd.api.entity.Posdta;
 import com.pd.api.entity.User;
+import org.apache.commons.lang3.StringUtils;
 
 public class PosdtaWrapper {
 
@@ -17,9 +18,12 @@ public class PosdtaWrapper {
         else if(rating < 1) this.rating = 1;
         else this.rating = rating;
     }
-    
+
+    /*
+    We better check if the posdta is null, is empty
+     */
     public String getPosdta() {
-        return posdta;
+        return StringUtils.isBlank(posdta) ? null : posdta;
     }
     
     public int getRating() {
@@ -38,11 +42,15 @@ public class PosdtaWrapper {
         return new Posdta(user, book, posdta, rating);
     }
 
-    public Boolean isRatingOnly() { return rating > 0 && posdta == null; }
+    public Boolean isRatingOnly() { return hasRating() && !hasPosdta(); }
 
-    public Boolean isPosdtaOnly() { return rating == 0 && posdta != null; }
+    public Boolean isPosdtaOnly() { return !hasRating() && hasPosdta(); }
 
-    public Boolean isRatingAndPosdta() { return rating > 0 && posdta != null; }
+    public Boolean isRatingAndPosdta() { return hasRating() && hasPosdta(); }
+
+    public Boolean hasRating() { return rating > 0;}
+
+    public Boolean hasPosdta() { return !StringUtils.isBlank(posdta);}
     
     @Override
     public String toString() {
