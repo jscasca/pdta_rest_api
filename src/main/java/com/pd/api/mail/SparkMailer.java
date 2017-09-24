@@ -22,7 +22,8 @@ public class SparkMailer implements Mailer {
     public SparkMailer() {}
 
     public void sendSingleMail(String from, String recipient, String subject, String text, String html) {
-        Client client = new Client( "56004d46308b04e57faef5d0946b959dad393b2f");
+        //Client client = new Client( "56004d46308b04e57faef5d0946b959dad393b2f");
+        Client client = new Client( API_KEY);
         try {
             client.sendMessage(from, recipient, subject, text, html);
         } catch (SparkPostException e) {
@@ -34,14 +35,13 @@ public class SparkMailer implements Mailer {
     public void sendVerificationMail(VerificationToken token) {
         String[] addresses = new String[1];
         addresses[0] = token.getEmail();
-        String email = "Tu token es " + token.getToken();
         String subject = "Change your password";
-        String emailText = "Tu token es: " + token.getToken() + "\n" +
-                "O ingresa a la liga http://prologes.com/reset.php?token=" + token.getToken() + "\n" +
-                "blop blop blop";
-        String emailHtml = "Tu token es: " + token.getToken() + "\n" +
-                "O ingresa a la liga http://prologes.com/reset.php?token=" + token.getToken() + "\n" +
-                "blop blop blop";
+        String emailText = "Your token number is: " + token.getToken() + "\n" +
+                "Access http://prologes.com/reset.php?token=" + token.getToken() + " to change your password.\n" +
+                "";
+        String emailHtml = "Your token number is: " + token.getToken() + "<br>\n" +
+                "Access <a href='http://prologes.com/reset.php?token=" + token.getToken() + "'>http://prologes.com/reset.php?token=" + token.getToken() + "</a> to change your password.<br>\n" +
+                "";
         try {
             sendSingleMail(SUPPORT_SENDER_MAIL, token.getEmail(), subject, emailText, emailHtml);
         } catch (Exception e) {
