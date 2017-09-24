@@ -14,6 +14,11 @@ import com.pd.api.db.DAO;
 import com.pd.api.exception.InvalidParameterException;
 import com.pd.api.exception.InvalidStateException;
 
+import static com.pd.api.entity.Event.*;
+import static com.pd.api.entity.Event.EventType.NULL;
+import static com.pd.api.entity.Event.EventType.POSDTA;
+import static com.pd.api.entity.Event.EventType.RATED;
+
 public class BookServiceImplementation {
 
     private static final Logger LOG = LoggerFactory.getLogger(BookServiceImplementation.class);
@@ -101,7 +106,7 @@ public class BookServiceImplementation {
     public static List<Posdta> getBookPosdtasWithUserVotes(String username, Long bookId, int start, int limit) {
         User user = DAO.getUserByUsername(username);
         Book book = DAO.get(Book.class, bookId);
-        List<Posdta> posdtas = DAO.getAll(Posdta.class, "where book.id = ?", "", start, limit, bookId);
+        List<Posdta> posdtas = DAO.getAll(Posdta.class, "where book.id = ? and posdta is not null", "", start, limit, bookId);
         for(int i = 0; i < posdtas.size(); i++) {
             Posdta posdta = posdtas.get(i);
             UserVote vote = DAO.getUnique(UserVote.class, "where user = ? and posdta = ?", user, posdta);
@@ -138,7 +143,7 @@ public class BookServiceImplementation {
         //Check if it was wish listed and remove
         unwishlistBook(user, book);
         LOG.debug("Book was unwishlisted");
-        DAO.saveEventWithBook(new EventWithBook(user, Event.EventType.STARTED_READING, book));
+        DAO.saveEventWithBook(new EventWithBook(user, EventType.STARTED_READING, book));
         LOG.debug("Book reading event was saved");
     }
     
@@ -177,27 +182,29 @@ public class BookServiceImplementation {
         User user = DAO.getUserByUsername(username);
         Posdta posdta = DAO.getUnique(Posdta.class, "where user = ? and book = ? ", user, book); //Check if there was a Posdta already
         BookReading reading = DAO.getUnique(BookReading.class, "where user = ? and book = ?", user, book);
-        boolean triggerEvent = false;
+        EventType type = NULL;
         //Complete
         if(posdtaWrapper.isRatingAndPosdta()) {
             if(posdta != null) throw new DuplicateResourceException("A posdta already exists for this book");
             if(reading != null) posdta = new Posdta(reading, posdtaWrapper.getPosdta(), posdtaWrapper.getRating());
             else posdta = new Posdta(user, book, posdtaWrapper.getPosdta(), posdtaWrapper.getRating());
-            triggerEvent = true;
+            type = POSDTA;
         } else if(posdtaWrapper.isPosdtaOnly()) {
             if(posdta == null) throw new InvalidStateException("This posdta does not have a rating");
             if(posdta.getPosdta() != null) throw new DuplicateResourceException("This posdta already exists");
             posdta.setPosdta(posdtaWrapper.getPosdta());
-            triggerEvent = true;
+            type = POSDTA;
         } else if(posdtaWrapper.isRatingOnly()) {
             if(posdta != null && posdta.getRating() > 0) throw new DuplicateResourceException("A rating already exist for this book");
             if(reading != null) posdta = new Posdta(reading, posdtaWrapper.getRating());
             else posdta = new Posdta(user, book, null, posdtaWrapper.getRating());
+            type = RATED;
         }
         posdta = DAO.put(posdta);
-        if(triggerEvent) {
-            EventWithPosdta posdtaEvent = new EventWithPosdta(user, Event.EventType.POSDTA, posdta);
-            DAO.put(posdtaEvent);
+        switch(type) {
+            case POSDTA: DAO.put(new EventWithPosdta(user, POSDTA, posdta)); break;
+            case RATED: DAO.put(new EventWithPosdta(user, RATED, posdta)); break;
+            default: break;
         }
         if(reading != null) {
             DAO.remove(reading.getClass(), reading.getId());
@@ -207,30 +214,6 @@ public class BookServiceImplementation {
             DAO.remove(wishlisted.getClass(), wishlisted.getId());
         }
         return posdta;
-        /*User user = DAO.getUserByUsername(username);
-        Book book = DAO.get(Book.class, bookId);
-        
-        Posdta posdta = DAO.getUnique(Posdta.class, "where user = ? and book = ? ", user, book); //Check if there was a Posdta already
-        if(posdta != null) throw new InvalidStateException("There is already a Posdta for this book"); //Duplicate posdta 
-        
-        BookReading reading = DAO.getUnique(BookReading.class, "where user = ? and book = ?", user, book);
-        if(reading != null) {
-            posdta = posdtaWrapper.getPosdta(reading);
-        } else {
-            posdta = posdtaWrapper.getPosdta(user, book);
-        }
-        posdta = DAO.put(posdta);
-        if(reading != null) {
-            DAO.remove(reading.getClass(), reading.getId());
-        }
-        BookWishlisted wishlisted = DAO.getUnique(BookWishlisted.class, "where user = ? and book = ?", user, book);
-        if(wishlisted != null) {
-            DAO.remove(wishlisted.getClass(), wishlisted.getId());
-        }
-        
-        EventWithPosdta posdtaEvent = new EventWithPosdta(user, Event.EventType.POSDTA, posdta);
-        DAO.put(posdtaEvent);
-        return posdta;*/
     }
     
     /**
@@ -246,7 +229,7 @@ public class BookServiceImplementation {
         favorited = new BookFavorited(user, book);
         favorited = DAO.put(favorited);
         book = DAO.put(book);
-        DAO.saveEventWithBook(new EventWithBook(user, Event.EventType.FAVORITED, book));
+        DAO.saveEventWithBook(new EventWithBook(user, EventType.FAVORITED, book));
     }
     
     /**
@@ -277,7 +260,7 @@ public class BookServiceImplementation {
         wishlisted = new BookWishlisted(user, book);
         wishlisted = DAO.put(wishlisted);
         DAO.put(book);
-        DAO.saveEventWithBook(new EventWithBook(user, Event.EventType.WISHLISTED, book));
+        DAO.saveEventWithBook(new EventWithBook(user, EventType.WISHLISTED, book));
     }
     
     /**
@@ -310,6 +293,16 @@ public class BookServiceImplementation {
         Book book = DAO.get(Book.class, bookId);
         UserToBook userToBook = new UserToBook(user, book);
         return userToBook;
+    }
+
+    public static Book requestCustomBook(String username, BookRequestWrapper request) {
+        User user = DAO.getUserByUsername(username);
+        Book book = requestNewBook(request);
+        //do something with the new book
+        BookRecordRequest brr = new BookRecordRequest(user, book);
+        DAO.put(brr);
+        //save an event with the user
+        return book;
     }
     
     /**
@@ -346,6 +339,7 @@ public class BookServiceImplementation {
         Book book = new Book(work, request.getTitle(), icon, thumbnail, lang);
         book = DAO.put(book);
         //Create bookRequest
+        //BookRecordRequest request = new BookRecordRequest(book, user);
         //NewBookRequest requestLog = new NewBookRequest(user, request.getTitle(), request.getAuthorString(), request.getLanguageString());
         //DAO.put(requestLog);
         return book;

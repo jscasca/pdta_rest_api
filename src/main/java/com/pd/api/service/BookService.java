@@ -272,8 +272,15 @@ public class BookService {
     @Secured("ROLE_USER")
     @RequestMapping(value="/requests", method = RequestMethod.POST)
     @ResponseBody
-    public Book requestNewBook(@RequestBody final BookRequestWrapper newRequestWrapper) {
+    public Book requestNewBook(@ModelAttribute final CustomUserData userData, @RequestBody final BookRequestWrapper newRequestWrapper) {
         return BookServiceImplementation.requestNewBook(newRequestWrapper);
+    }
+
+    @Secured("ROLE_USER")
+    @RequestMapping(value="/requests/custom", method = RequestMethod.POST)
+    @ResponseBody
+    public Book requestCustomBook(@ModelAttribute final CustomUserData userData, @RequestBody final BookRequestWrapper newRequestWrapper) {
+        return BookServiceImplementation.requestCustomBook(userData.getUsername(), newRequestWrapper);
     }
     
     /*@Secured("ROLE_ADMIN")
