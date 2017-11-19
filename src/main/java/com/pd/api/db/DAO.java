@@ -510,7 +510,7 @@ e2.setSomeField(anotherValue);
     }
     
     public static List<Posdta> getUserPosdtas(Long userId, int first, int limit) {
-        return getAll(Posdta.class, "where user.id = ?", "", first, limit, userId);
+        return getAll(Posdta.class, "where user.id = ?", "ORDER BY id DESC", first, limit, userId);
     }
     
     //TODO: fix this method
