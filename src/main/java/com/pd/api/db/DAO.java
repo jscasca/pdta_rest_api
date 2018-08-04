@@ -1,6 +1,7 @@
 package com.pd.api.db;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -11,6 +12,8 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
 
 import com.pd.api.entity.*;
+import com.pd.api.entity.aux.CommentNode;
+import com.pd.api.entity.aux.CommentTree;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.pd.api.db.indexer.AuthorIndex;
@@ -200,6 +203,8 @@ e2.setSomeField(anotherValue);
         EntityManager em = getEM();
         return em.find(type, id);
     }
+
+    public static Book getBookById(Long bookId) { return get(Book.class, bookId); }
     
     public static Query createQuery(String query) {
         EntityManager em = getEM();
@@ -235,7 +240,7 @@ e2.setSomeField(anotherValue);
     }
     
     public static <T> List<T> getAll(Class<T> type, int first, int limit) {
-        return getAll(type, "", "", first, limit);
+        return getAll(type, "", " order by id desc ", first, limit);
     }
     
     @SuppressWarnings("unchecked")
@@ -643,6 +648,40 @@ e2.setSomeField(anotherValue);
         if(q.getResultList().isEmpty()) {
             saveEvent(e);
         }
+    }
+
+    public static List<CommentThread> getBookThreads(Book book, int first, int limit) {
+        Query q = createQuery("SELECT t FROM ThreadForBook t where book = ? order by id desc", book);
+        return q.getResultList();
+    }
+
+    public static List<Comment> getRepliesForComment(Comment comment) {
+        Query q = createQuery("SELECT c FROM Comment c where parent.id = ? order by id desc", comment.getId());
+        return q.getResultList();
+    }
+
+    public static CommentTree getBookCommentTree(Book book) {
+        List<CommentThread> bookThreads = getBookThreads(book, 0, 0);
+        return getCommentTree(bookThreads);
+    }
+
+    public static CommentTree getCommentTree(List<CommentThread> threads) {
+        List<CommentNode> nodes = new ArrayList<>();
+        for(int i = 0; i < threads.size(); i++) {
+            Comment comment = threads.get(i).getComment();
+            CommentNode node = getCommentNodes(comment);
+            nodes.add(node);
+        }
+        return CommentTree.createCommentTree(nodes);
+    }
+
+    public static CommentNode getCommentNodes(Comment comment) {
+        List<Comment> rawReplies = getRepliesForComment(comment);
+        List<CommentNode> replyTree = new ArrayList<CommentNode>();
+        for(int i = 0; i < rawReplies.size(); i++) {
+            replyTree.add(getCommentNodes(rawReplies.get(i)));
+        }
+        return CommentNode.createCommentNode(comment, replyTree);
     }
     
 }

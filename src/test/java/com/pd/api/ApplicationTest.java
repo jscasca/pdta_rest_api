@@ -2,17 +2,9 @@ package com.pd.api;
 
 
 import com.pd.api.db.DAO;
-import com.pd.api.entity.Author;
-import com.pd.api.entity.Book;
-import com.pd.api.entity.BookSuggestions;
-import com.pd.api.entity.Credential;
-import com.pd.api.entity.Language;
-import com.pd.api.entity.Posdta;
-import com.pd.api.entity.Role;
-import com.pd.api.entity.SocialProvider;
-import com.pd.api.entity.User;
-import com.pd.api.entity.UserVote;
-import com.pd.api.entity.Work;
+import com.pd.api.entity.*;
+import com.pd.api.entity.aux.CommentNode;
+import com.pd.api.entity.aux.CommentTree;
 import com.pd.api.entity.aux.MemberRegistration;
 import com.pd.api.entity.aux.PosdtaWrapper;
 import com.pd.api.exception.DuplicateResourceException;
@@ -20,6 +12,7 @@ import com.pd.api.security.AuthTools;
 import com.pd.api.security.SocialLogin;
 import com.pd.api.security.SocialLoginUsername;
 import com.pd.api.service.impl.BookServiceImplementation;
+import com.pd.api.service.impl.CommentServiceImplementation;
 import com.pd.api.service.impl.SearchServiceImplementation;
 import com.pd.api.util.LuceneIndexer;
 
@@ -37,9 +30,61 @@ public class ApplicationTest {
 
     public static void main(String[] args) throws IOException {
         //testFavoritesList();
-        Credential c = DAO.get(Credential.class, 1L);
-        c.setPassword(AuthTools.encode("notroot"));
-        DAO.put(c);
+        //Credential c = DAO.get(Credential.class, 1L);
+        //c.setPassword(AuthTools.encode("notroot"));
+        //DAO.put(c);
+        Long cId = 4L;
+        reply(reply(cId, "Your welcome!"), "No problem");
+        Long bookId = 16L;
+//        Long replyTo = makeComment(bookId);
+//        Long reply = reply(replyTo);
+        CommentTree interactions = getCommentTree(bookId);
+//        System.out.println(interactions);
+        printCommentTree(interactions);
+//        List<CommentNode> node = interactions.getNodes();
+//        for(int i = 0; i < node.size(); i++) {
+//            CommentNode c = node.get(i);
+//        }
+    }
+
+    public static void printCommentTree(CommentTree tree) {
+        List<CommentNode> nodes = tree.getNodes();
+        for(int i = 0; i < nodes.size(); i++) {
+            printCommentNode(nodes.get(i), 0);
+        }
+    }
+
+    public static void printCommentNode(CommentNode node, int level) {
+        System.out.println(tabs(level) + node.getComment());
+        List<CommentNode> nodes = node.getNodes();
+        for(int i = 0; i < nodes.size(); i++) {
+            printCommentNode(nodes.get(i), level + 1);
+        }
+    }
+
+    public static String tabs(int level) {
+        StringBuffer sb = new StringBuffer();
+        for(int i = 0; i < level; i++) {
+            sb.append('|');
+        }
+        return sb.toString();
+    }
+
+    public static CommentTree getCommentTree(Long bookId) {
+        return CommentServiceImplementation.getBookCommentTree(bookId);
+    }
+
+    public static Long reply(Long commentId) { return reply(commentId, "Thanks!");}
+    public static Long reply(Long commentId, String reply) {
+        Comment r = CommentServiceImplementation.reply("tin", commentId, reply);
+        return r.getId();
+    }
+
+    public static Long makeComment(Long bookId) {
+        String username = "tin";
+        Comment c = CommentServiceImplementation.startBookThread(username, bookId, "Nice read");
+        System.out.println(c);
+        return c.getId();
     }
     
     public static void savePosdta() {
