@@ -29,7 +29,7 @@ public class AuthorServiceImplementation {
     public static List<Book> getAuthorBooks(Long id, int first, int limit) {
         //TODO: implement
         Author author = DAO.get(Author.class, id);
-        return DAO.getAll(Book.class, " where work.author = ? ", "", first, limit, author);
+        return DAO.getAll(Book.class, " where ? in elements (work.authors)", "", first, limit, author);
     }
     
     public static Author createAuthor(AuthorWrapper authorWrapper) {
