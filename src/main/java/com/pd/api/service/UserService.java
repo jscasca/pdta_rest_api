@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.pd.api.entity.aux.UserProfile;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -49,6 +50,13 @@ public class UserService {
         return UserServiceImplementation.getUserInfo(id);
     }
 
+    @RequestMapping(value = "/{id:[0-9]+}/library", method = RequestMethod.GET)
+    @ResponseBody
+    public UserProfile getUserProfile(@PathVariable("id") final Long id,
+                                      final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
+        return UserServiceImplementation.getUserProfile(id);
+    }
+
     @RequestMapping(value = "/{id:[0-9]+}/libraryView", method = RequestMethod.GET)
     @ResponseBody
     public LibraryView getUserLibraryView(@PathVariable("id") final Long id,
@@ -65,9 +73,9 @@ public class UserService {
     }
     
     /**
-     * 
-     * @param id
-     * @param start
+     *
+     * @pathVariable id
+     * @param first
      * @param limit
      * @param uriBuilder
      * @param response
@@ -84,8 +92,8 @@ public class UserService {
     
     /**
      * 
-     * @param id
-     * @param start
+     * @pathVariable id
+     * @param first
      * @param limit
      * @param uriBuilder
      * @param response

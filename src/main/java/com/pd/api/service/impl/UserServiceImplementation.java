@@ -13,6 +13,7 @@ import com.pd.api.entity.Posdta;
 import com.pd.api.entity.User;
 import com.pd.api.entity.aux.LibraryView;
 import com.pd.api.entity.aux.UserInfo;
+import com.pd.api.entity.aux.UserProfile;
 import com.pd.api.entity.aux.UserToUser;
 import com.pd.api.exception.GeneralException;
 
@@ -23,10 +24,25 @@ public class UserServiceImplementation {
         return DAO.getAll(User.class, first, limit);
     }
 
-    public static User getUserById(Long id) {
-        User user = DAO.get(User.class, id);
+//    public static User getUserById(Long id) {
+//        User user = DAO.get(User.class, id);
+//        if(user == null) throw new GeneralException("User not found");
+//        return user;
+//    }
+
+    public static User getUserById(Long id) { return getUser(DAO.getUserById(id));}
+    public static User getUserByName(String name) { return getUser(DAO.getUserByUsername(name));}
+    public static User getUser(User user) {
         if(user == null) throw new GeneralException("User not found");
         return user;
+    }
+
+    public static UserProfile getUserProfile(Long id) { return getUserProfile(DAO.getUserById(id));}
+    public static UserProfile getUserProfile(String name) { return getUserProfile(DAO.getUserByUsername(name));}
+    public static UserProfile getUserProfile(User user) {
+    if(user == null) throw new GeneralException("User not found");
+        UserProfile profile = new UserProfile(user);
+        return profile;
     }
     
     public static LibraryView getUserLibraryView(Long id) {
