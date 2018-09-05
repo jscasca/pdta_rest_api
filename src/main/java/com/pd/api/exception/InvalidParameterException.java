@@ -1,7 +1,7 @@
 package com.pd.api.exception;
 
 /**
- * Exception used when the request received and invalid parameter that broke something
+ * Exception used when the request received an invalid parameter that broke something
  * 
  * @author tin
  *
