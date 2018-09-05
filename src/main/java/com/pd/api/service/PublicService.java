@@ -74,7 +74,8 @@ public class PublicService {
     public User registerSocialMember(@RequestBody SocialRegistration registration, @PathVariable("provider") final String provider) {
         return PublicServiceImplementation.registerMemberSocialMedia(registration, provider);
     } 
-    
+
+    //TODO: implement password request with language variable
     @RequestMapping(value="/passwordRequest", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void requestPassword(@RequestBody String user) {

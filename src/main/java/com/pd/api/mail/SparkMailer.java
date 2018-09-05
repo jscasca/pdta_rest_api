@@ -37,10 +37,10 @@ public class SparkMailer implements Mailer {
         addresses[0] = token.getEmail();
         String subject = "Change your password";
         String emailText = "Your token number is: " + token.getToken() + "\n" +
-                "Access http://prologes.com/reset.php?token=" + token.getToken() + " to change your password.\n" +
+                "Access http://prologes.com/reset?token=" + token.getToken() + " to change your password.\n" +
                 "";
         String emailHtml = "Your token number is: " + token.getToken() + "<br>\n" +
-                "Access <a href='http://prologes.com/reset.php?token=" + token.getToken() + "'>http://prologes.com/reset.php?token=" + token.getToken() + "</a> to change your password.<br>\n" +
+                "Access <a href='http://prologes.com/reset?token=" + token.getToken() + "'>http://prologes.com/reset?token=" + token.getToken() + "</a> to change your password.<br>\n" +
                 "";
         try {
             sendSingleMail(SUPPORT_SENDER_MAIL, token.getEmail(), subject, emailText, emailHtml);
