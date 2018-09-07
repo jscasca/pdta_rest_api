@@ -203,12 +203,12 @@ public class BookService {
                               @RequestBody (required=false) final PosdtaWrapper posdtaWrapper) {
         return BookServiceImplementation.savePosdta(userData.getUsername(), bookId, posdtaWrapper);
     }
-    
+
     /**
-     * 
+     *
      * @param userData
      * @param bookId
-     * @param posdtaWrapper
+
      * @return the created posdta
      */
     @Secured("ROLE_USER")

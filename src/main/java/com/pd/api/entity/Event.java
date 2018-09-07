@@ -40,10 +40,12 @@ public class Event {
         STARTED_FOLLOWING,
         STOPPED_FOLLOWING,
         POSDTA,
+        RATED,
         WISHLISTED,
         SUGGESTED,
         FAVORITED,
-        ADDED
+        ADDED,
+        NULL
     };
     
     @Id

@@ -3,6 +3,7 @@ package com.pd.api.service.impl;
 import com.pd.api.db.DAO;
 import com.pd.api.entity.*;
 import com.pd.api.entity.aux.CommentTree;
+import com.pd.api.exception.InvalidParameterException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,8 +16,16 @@ public class CommentServiceImplementation {
 
     private static final Logger LOG = LoggerFactory.getLogger(BookServiceImplementation.class);
 
+    private static final int CHAR_LIMIT = 6400;
+
     public static Comment startBookThread(String username, Long bookId, String text){
         //Take a book
+        if(text == "") {
+            throw new InvalidParameterException("The content cannot be left empty");
+        }
+        if(text.length() > CHAR_LIMIT) {
+            throw new InvalidParameterException("The content cannot have more than 6,400 characters");
+        }
         User user = DAO.getUserByUsername(username);
         Book book = DAO.get(Book.class, bookId);
         Comment comment = new Comment(user, text);

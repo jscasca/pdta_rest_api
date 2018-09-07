@@ -503,15 +503,15 @@ e2.setSomeField(anotherValue);
     }
     
     public static List<Book> getUserFavorites(Long userId, int first, int limit) {
-        return getAllBooksFromQuery("select distinct bw.book from BookFavorited bw where bw.user.id = ?", first, limit, userId);
+        return getAllBooksFromQuery("select distinct bf.book from BookFavorited bf where bw.user.id = ? order by bf.id desc", first, limit, userId);
     }
     
     public static List<Book> getUserWishlisted(Long userId, int first, int limit) {
-        return getAllBooksFromQuery("select distinct bw.book from BookWishlisted bw where bw.user.id = ?", first, limit, userId);
+        return getAllBooksFromQuery("select distinct bw.book from BookWishlisted bw where bw.user.id = ? order by bw.id asc", first, limit, userId);
     }
     
     public static List<Book> getUserReading(Long userId, int first, int limit) {
-        return getAllBooksFromQuery("select distinct br.book from BookReading br where br.user.id = ?", first, limit, userId);
+        return getAllBooksFromQuery("select distinct br.book from BookReading br where br.user.id = ? order by br.id asc", first, limit, userId);
     }
     
     public static List<Posdta> getUserPosdtas(Long userId, int first, int limit) {
