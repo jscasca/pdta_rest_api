@@ -19,7 +19,6 @@ public class PropertiesLoader implements ServletContextListener {
     public void contextInitialized(ServletContextEvent event) {
         try {
             FileInputStream configFile = new FileInputStream(getClass().getClassLoader().getResource("config.properties").getFile());
-//            FileInputStream configFile = new FileInputStream("src/main/resources/config.properties");
             Properties p = new Properties(System.getProperties());
             p.load(configFile);
             System.setProperties(p);

@@ -40,7 +40,9 @@ public class UserServiceImplementation {
     public static UserProfile getUserProfile(Long id) { return getUserProfile(DAO.getUserById(id));}
     public static UserProfile getUserProfile(String name) { return getUserProfile(DAO.getUserByUsername(name));}
     public static UserProfile getUserProfile(User user) {
-    if(user == null) throw new GeneralException("User not found");
+        if(user == null) {
+            throw new GeneralException("User not found");
+        }
         UserProfile profile = new UserProfile(user);
         return profile;
     }

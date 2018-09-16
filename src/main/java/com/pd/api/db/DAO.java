@@ -503,7 +503,7 @@ e2.setSomeField(anotherValue);
     }
     
     public static List<Book> getUserFavorites(Long userId, int first, int limit) {
-        return getAllBooksFromQuery("select distinct bf.book from BookFavorited bf where bw.user.id = ? order by bf.id desc", first, limit, userId);
+        return getAllBooksFromQuery("select distinct bf.book from BookFavorited bf where bf.user.id = ? order by bf.id desc", first, limit, userId);
     }
     
     public static List<Book> getUserWishlisted(Long userId, int first, int limit) {

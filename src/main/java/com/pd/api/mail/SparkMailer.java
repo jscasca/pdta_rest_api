@@ -22,7 +22,6 @@ public class SparkMailer implements Mailer {
     public SparkMailer() {}
 
     public void sendSingleMail(String from, String recipient, String subject, String text, String html) {
-        //Client client = new Client( "56004d46308b04e57faef5d0946b959dad393b2f");
         Client client = new Client( API_KEY);
         try {
             client.sendMessage(from, recipient, subject, text, html);
