@@ -2,7 +2,8 @@ package com.pd.api.security;
 
 import java.util.Set;
 
-import com.pd.api.mail.SparkMailer;
+import com.pd.api.http.HttpConn;
+import com.pd.api.mail.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
@@ -16,7 +17,6 @@ import com.pd.api.entity.VerificationToken;
 import com.pd.api.entity.VerificationToken.VerificationType;
 import com.pd.api.entity.aux.PasswordResetForm;
 import com.pd.api.exception.InvalidAuthenticationException;
-import com.pd.api.mail.MandrillMailer;
 
 public class AuthTools {
 
@@ -37,7 +37,7 @@ public class AuthTools {
             throw new InvalidAuthenticationException("The username is invalid or does not exist");
         }
         if(!passwordEncoder.matches(password, credential.getPassword())) {
-            throw new InvalidAuthenticationException("Not auhtenticable");
+            throw new InvalidAuthenticationException("Not authenticable");
         }
         return credential;
     }
@@ -66,8 +66,13 @@ public class AuthTools {
         if(credential != null) {
             VerificationToken token = new VerificationToken(credential, VerificationType.PASSWORD_RESET, VerificationToken.DEFAULT_PASSWORD_RESET);
             token = DAO.put(token);
-            SparkMailer mailer = new SparkMailer();
-            mailer.sendVerificationMail(token);
+            // TODO: Make a mailing factory
+            Mailer mailer = new RemoteSibMailer(); // Maybe this should come from a factory?
+            try {
+                mailer.sendVerificationMail(token);
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
         }
     }
     
