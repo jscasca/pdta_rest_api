@@ -36,7 +36,7 @@ import com.pd.api.security.AuthTools;
 public class Credential implements Serializable {
 
 
-    public static final Pattern usernameValidator = Pattern.compile("^[a-zA-Z0-9_]{1,24}$");
+    public static final Pattern usernameValidator = Pattern.compile("^[a-zA-Z][a-zA-Z0-9_]{0,24}$");
     public static final Pattern emailValidator = Pattern.compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
     
     @Id
