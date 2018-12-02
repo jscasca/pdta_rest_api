@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.pd.api.entity.*;
 import com.pd.api.entity.aux.BookRequestWrapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
@@ -18,9 +19,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.pd.api.entity.Book;
-import com.pd.api.entity.Posdta;
-import com.pd.api.entity.User;
 import com.pd.api.entity.aux.BookInfo;
 import com.pd.api.entity.aux.PosdtaWrapper;
 import com.pd.api.entity.aux.UserToBook;
@@ -214,7 +212,7 @@ public class BookService {
     @Secured("ROLE_USER")
     @RequestMapping(value="/{id:[0-9]+}/posdtas", method = RequestMethod.POST)
     @ResponseBody
-    public Posdta leavePosdta(@ModelAttribute final CustomUserData userData,
+    public Posdta submitPosdta(@ModelAttribute final CustomUserData userData,
             @PathVariable("id") final Long bookId,
             @RequestBody(required=false) final PosdtaWrapper posdtaWrapper) {
         return BookServiceImplementation.savePosdta(userData.getUsername(), bookId, posdtaWrapper);
@@ -279,7 +277,8 @@ public class BookService {
     @Secured("ROLE_USER")
     @RequestMapping(value="/requests/custom", method = RequestMethod.POST)
     @ResponseBody
-    public Book requestCustomBook(@ModelAttribute final CustomUserData userData, @RequestBody final BookRequestWrapper newRequestWrapper) {
+    public Book requestCustomBook(@ModelAttribute final CustomUserData userData,
+                                  @RequestBody final BookRequestWrapper newRequestWrapper) {
         return BookServiceImplementation.requestCustomBook(userData.getUsername(), newRequestWrapper);
     }
     
@@ -311,5 +310,53 @@ public class BookService {
             @RequestParam(value="start", defaultValue="0") final int start,
             @RequestParam(value="limit", defaultValue="10") final int limit) {
         return BookServiceImplementation.getBooksWithTheSameAuthor(bookId, start, limit);
+    }
+
+    @Secured("ROLE_USER")
+    @RequestMapping(value="/{id:[0-9]+}/similar", method = RequestMethod.POST)
+    @ResponseBody
+    public BookSimilarity suggestBookSimilarity(@PathVariable("id") final Long original,
+                                                @RequestBody final Long similar,
+                                                @ModelAttribute final CustomUserData userData) {
+        return BookServiceImplementation.suggestSimilairty(userData.getUsername(), original, similar);
+    }
+
+    @RequestMapping(value="/{id:[0-9]+}/similarBooks", method = RequestMethod.GET)
+    @ResponseBody
+    public List<BookSimilarity> getSimilarBooks(@PathVariable("id") final Long bookId,
+                                                @ModelAttribute final CustomUserData userData) {
+        if(userData == null) {
+            return BookServiceImplementation.getSimilarBooks(bookId);
+        } else {
+            return BookServiceImplementation.getSimilarBooks(bookId, userData.getUsername());
+        }
+    }
+
+    @RequestMapping(value="/{id:[0-9]+}/similarBooks/{target:[0-9]+}/vote", method = RequestMethod.POST)
+    @ResponseBody
+    public BookSimilarity voteBookSimilarity() {
+        return null;
+    }
+
+    @RequestMapping(value="/similar/{id:[0-9]+}", method = RequestMethod.POST)
+    @ResponseBody
+    public BookSimilarityVote voteSimilarity(@PathVariable("id") final Long similarity,
+                                             @RequestParam(value="vote") final Boolean vote,
+                                             @ModelAttribute final CustomUserData userData) {
+        return BookServiceImplementation.voteBookSimilarity(userData.getUsername(), similarity, vote);
+    }
+
+    @RequestMapping(value="/similar/{id:[0-9]+}/up", method = RequestMethod.POST)
+    @ResponseBody
+    public BookSimilarityVote voteSimilarityUp(@PathVariable("id") final Long similarity,
+                                             @ModelAttribute final CustomUserData userData) {
+        return BookServiceImplementation.voteBookSimilarity(userData.getUsername(), similarity, true);
+    }
+
+    @RequestMapping(value="/similar/{id:[0-9]+}/down", method = RequestMethod.POST)
+    @ResponseBody
+    public BookSimilarityVote voteSimilarityDown(@PathVariable("id") final Long similarity,
+                                             @ModelAttribute final CustomUserData userData) {
+        return BookServiceImplementation.voteBookSimilarity(userData.getUsername(), similarity, false);
     }
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.pd.api.entity.Club;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
@@ -65,20 +66,46 @@ public class MyService extends AbstractService {
         return MyServiceImplementation.getUserLibraryView(userData.getUsername());
     }
 
+    @RequestMapping(method = RequestMethod.GET, value="/groups")
+    @ResponseBody
+    public List<Club> getMyLibrary(@ModelAttribute final CustomUserData userData,
+                                   @RequestParam(value="start", defaultValue="0") int first,
+                                   @RequestParam(value="limit", defaultValue="25") int limit) {
+        return MyServiceImplementation.getMyClubs(userData.getUsername(), first, limit);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value="/books")
+    @ResponseBody
+    public List<Book> getMyBooks(@ModelAttribute final CustomUserData userData,
+                                 @RequestParam(value="filter", defaultValue = "") String filter,
+                                 @RequestParam(value="start", defaultValue="0") int first,
+                                 @RequestParam(value="limit", defaultValue="25") int limit) {
+        return MyServiceImplementation.getMyBooks(userData.getUsername(), filter, first, limit);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value="/reads")
+    @ResponseBody
+    public List<Book> getMyReadings(@ModelAttribute final CustomUserData userData,
+                                 @RequestParam(value="filter", defaultValue = "") String filter,
+                                 @RequestParam(value="start", defaultValue="0") int first,
+                                 @RequestParam(value="limit", defaultValue="50") int limit) {
+        return MyServiceImplementation.getMyReadBooks(userData.getUsername(), filter, first, limit);
+    }
+
     @RequestMapping(method = RequestMethod.GET, value="/wishlists")
     @ResponseBody
     public List<Book> getWishlisted(@ModelAttribute final CustomUserData userData,
             @RequestParam(value="start", defaultValue="0") int first,
-            @RequestParam(value="limit", defaultValue="10") int limit,
+            @RequestParam(value="limit", defaultValue="25") int limit,
             final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
         return MyServiceImplementation.getWishlisted(userData.getUsername(), first, limit);
     }
 
-    @RequestMapping(method = RequestMethod.GET, value="/readings")
+    @RequestMapping(method = RequestMethod.GET, value="/reading")
     @ResponseBody
     public List<Book> getReadings(@ModelAttribute final CustomUserData userData,
             @RequestParam(value="start", defaultValue="0") int first,
-            @RequestParam(value="limit", defaultValue="10") int limit,
+            @RequestParam(value="limit", defaultValue="25") int limit,
             final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
         return MyServiceImplementation.getReading(userData.getUsername(), first, limit);
     }
@@ -87,7 +114,7 @@ public class MyService extends AbstractService {
     @ResponseBody
     public List<Book> getFavorites(@ModelAttribute final CustomUserData userData,
             @RequestParam(value="start", defaultValue="0") int first,
-            @RequestParam(value="limit", defaultValue="10") int limit,
+            @RequestParam(value="limit", defaultValue="25") int limit,
             final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
         return MyServiceImplementation.getFavorited(userData.getUsername(), first, limit);
     }
@@ -96,7 +123,7 @@ public class MyService extends AbstractService {
     @ResponseBody
     public List<Posdta> getPosdtas(@ModelAttribute final CustomUserData userData,
             @RequestParam(value="start", defaultValue="0") int first,
-            @RequestParam(value="limit", defaultValue="10") int limit,
+            @RequestParam(value="limit", defaultValue="25") int limit,
             final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
         return MyServiceImplementation.getPosdtas(userData.getUsername(), first, limit);
     }
@@ -105,7 +132,7 @@ public class MyService extends AbstractService {
     @ResponseBody
     public List<Book> getMyRecommendations(@ModelAttribute final CustomUserData userData,
             @RequestParam(value="start", defaultValue="0") int first,
-            @RequestParam(value="limit", defaultValue="10") int limit,
+            @RequestParam(value="limit", defaultValue="25") int limit,
             final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
         return MyServiceImplementation.getUserRecommendations(userData.getUsername(), first, limit);
     }

@@ -6,6 +6,7 @@ import java.util.*;
 import com.pd.api.entity.*;
 import com.pd.api.entity.aux.*;
 import com.pd.api.exception.DuplicateResourceException;
+import com.pd.api.exception.GeneralException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -280,6 +281,57 @@ public class BookServiceImplementation {
             DAO.delete(wishlisted);
             book = DAO.put(book);
         }
+    }
+
+    public static List<BookSimilarity> getSimilarBooks(Long bookId) {
+        return getSimilarBooks(DAO.getBookById(bookId));
+    }
+
+    public static List<BookSimilarity> getSimilarBooks(Book book) {
+        return DAO.getSimilarBooks(book);
+    }
+
+    public static List<BookSimilarity> getSimilarBooks(Long bookId, String username) {
+        User user = DAO.getUserByUsername(username);
+        List<BookSimilarity> similarities = getSimilarBooks(DAO.getBookById(bookId));
+        // Instead of doing it one by one we can query SELECT vote from SimVote WHERE vote.id.sim.bookId = bookId and user = user
+        for(BookSimilarity similarity: similarities) {
+            BookSimilarityVote vote = DAO.getBookSimilarityVoteForUser(similarity, user);
+            if(vote != null) {
+                similarity.setVote(vote.getVote());
+            }
+        }
+        return similarities;
+    }
+
+    public static BookSimilarity suggestSimilairty(String username, Long original, Long similar) {
+        return suggestSimilarity(DAO.getUserByUsername(username), DAO.getBookById(original), DAO.getBookById(similar));
+    }
+
+    public static BookSimilarity suggestSimilarity(User user, Book original, Book similar) {
+        if(user == null || original == null || similar == null) {
+            throw new GeneralException("Missing component");
+        }
+        BookSimilarity similarity = new BookSimilarity(original, similar, user);
+        similarity = DAO.put(similarity);
+        return similarity;
+    }
+
+    public static BookSimilarityVote voteBookSimilarity(String username, Long original, Long similar, boolean voteValue) {
+        return voteBookSimilarity(DAO.getUserByUsername(username), null, voteValue);
+    }
+
+    public static BookSimilarityVote voteBookSimilarity(String username, Long similarity, boolean voteValue) {
+        return voteBookSimilarity(DAO.getUserByUsername(username), DAO.get(BookSimilarity.class, similarity), voteValue);
+    }
+
+    public static BookSimilarityVote voteBookSimilarity(User user, BookSimilarity similarity, boolean voteValue) {
+        if(user == null || similarity == null) {
+            throw new GeneralException("Missing component");
+        }
+        BookSimilarityVote vote = new BookSimilarityVote(user, similarity, voteValue);
+        vote = DAO.put(vote);
+        return vote;
     }
     
     /**

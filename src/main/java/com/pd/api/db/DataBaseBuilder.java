@@ -28,6 +28,9 @@ public class DataBaseBuilder {
         ac.addAnnotatedClass(BookRecordRequest.class);
         ac.addAnnotatedClass(BookWishlisted.class);
         ac.addAnnotatedClass(BookSuggestions.class);
+        /*Book siimlarities*/
+        ac.addAnnotatedClass(BookSimilarity.class);
+        ac.addAnnotatedClass(BookSimilarityVote.class);
         ac.addAnnotatedClass(Comment.class);
         ac.addAnnotatedClass(CommentThread.class);
         ac.addAnnotatedClass(Credential.class);
@@ -35,11 +38,15 @@ public class DataBaseBuilder {
         ac.addAnnotatedClass(EventWithBook.class);
         ac.addAnnotatedClass(EventWithUser.class);
         ac.addAnnotatedClass(EventWithPosdta.class);
+        ac.addAnnotatedClass(Club.class);
+        ac.addAnnotatedClass(ClubMembership.class);
+        ac.addAnnotatedClass(ClubReading.class);
         ac.addAnnotatedClass(Language.class);
         ac.addAnnotatedClass(Posdta.class);
         ac.addAnnotatedClass(PosdtaVoting.class);
         ac.addAnnotatedClass(Role.class);
         ac.addAnnotatedClass(ThreadForBook.class);
+        ac.addAnnotatedClass(ThreadForClub.class);
         ac.addAnnotatedClass(User.class);
         ac.addAnnotatedClass(UserBookInteraction.class);
         ac.addAnnotatedClass(UserVote.class);

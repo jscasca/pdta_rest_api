@@ -23,6 +23,8 @@ import com.pd.api.entity.aux.LibraryView;
 import com.pd.api.security.SocialLogin;
 import com.pd.api.security.SocialLoginUsername;
 
+import com.pd.api.entity.ClubReading.ReadingStatus;
+
 @Transactional
 public class DAO {
 
@@ -266,6 +268,17 @@ e2.setSomeField(anotherValue);
         }
         return q.getResultList(); 
     }
+
+    public static <T> List<T> getAllFromQuery(Class<T> type, String query, int first, int limit, Object... params) {
+        Query q = createQuery(query, params);
+        if(first > 0) {
+            q.setFirstResult(first);
+        }
+        if(limit > 0) {
+            q.setMaxResults(limit);
+        }
+        return q.getResultList();
+    }
     
     //TODO: check this methods to be a single call
     public static List<Book> getAllBooksFromQuery(String query, int first, int limit, Object... params) {
@@ -307,6 +320,10 @@ e2.setSomeField(anotherValue);
         List<T> objs = q.getResultList();
         if(objs.size() == 0) return null;
         return objs.get(0);
+    }
+
+    public static ClubMembership getClubMembership(User u, Club c) {
+        return getUnique(ClubMembership.class, "WHERE id.user = ? AND id.club = ?", u, c);
     }
     
     /*public static List<User> getUserFollowers(User u, ListWrapper lw) {
@@ -513,9 +530,26 @@ e2.setSomeField(anotherValue);
     public static List<Book> getUserReading(Long userId, int first, int limit) {
         return getAllBooksFromQuery("select distinct br.book from BookReading br where br.user.id = ? order by br.id asc", first, limit, userId);
     }
+
+    public static List<Book> getUserRead(User user, int first, int limit) {
+        return getAllFromQuery(Book.class, "SELECT p.book FROM Posdta p WHERE p.user = ? order by p.finish desc", first, limit, user);
+    }
     
     public static List<Posdta> getUserPosdtas(Long userId, int first, int limit) {
         return getAll(Posdta.class, "where user.id = ?", "ORDER BY id DESC", first, limit, userId);
+    }
+
+    public static List<Posdta> getUserPosdtas(User user, int first, int limit) {
+        return getAll(Posdta.class, "where user.id = ?", "ORDER BY id DESC", first, limit, user);
+    }
+
+    public static List<UserBookInteraction> getUserBookInteractions(User user, int first, int limit) {
+//        return getAll(UserBookInteraction.class, " where user = ?", "", first, limit, user);
+        return getAllFromQuery(UserBookInteraction.class,
+                "SELECT DISTINCT i FROM " + UserBookInteraction.class.getName() + " i WHERE i.user = ? order by i.id desc",
+                first,
+                limit,
+                user);
     }
     
     //TODO: fix this method
@@ -650,6 +684,11 @@ e2.setSomeField(anotherValue);
         }
     }
 
+    public static List<CommentThread> getClubThreads(Club club, int first, int limit) {
+        Query q = createQuery("SELECT t FROM ThreadForClub t where club = ? order by id desc", club);
+        return q.getResultList();
+    }
+
     public static List<CommentThread> getBookThreads(Book book, int first, int limit) {
         Query q = createQuery("SELECT t FROM ThreadForBook t where book = ? order by id desc", book);
         return q.getResultList();
@@ -661,8 +700,13 @@ e2.setSomeField(anotherValue);
     }
 
     public static CommentTree getBookCommentTree(Book book) {
-        List<CommentThread> bookThreads = getBookThreads(book, 0, 0);
+        List<CommentThread> bookThreads = getBookThreads(book, 0, 50);
         return getCommentTree(bookThreads);
+    }
+
+    public static CommentTree getClubCommentTree(Club club) {
+        List<CommentThread> clubThreads = getClubThreads(club, 0, 50);
+        return getCommentTree(clubThreads);
     }
 
     public static CommentTree getCommentTree(List<CommentThread> threads) {
@@ -682,6 +726,61 @@ e2.setSomeField(anotherValue);
             replyTree.add(getCommentNodes(rawReplies.get(i)));
         }
         return CommentNode.createCommentNode(comment, replyTree);
+    }
+
+    public static List<User> getClubMembers(Club club, int first, int limit) {
+        Query q = createQuery("Select m.id.user FROM ClubMembership m WHERE m.id.club =  ?", club);
+        q.setFirstResult(first);
+        q.setMaxResults(limit);
+        return q.getResultList();
+    }
+
+    public static List<Club> getUserClubs(User user, int first, int limit) {
+        Query q = createQuery("Select m.id.club FROM ClubMembership m WHERE m.id.user =  ?", user);
+        q.setFirstResult(first);
+        q.setMaxResults(limit);
+        return q.getResultList();
+    }
+
+    public static List<ClubReading> getClubReadingByStatus(Club club, ReadingStatus status, int first, int limit, String orderBy) {
+        Query q = createQuery("Select r FROM ClubReading r WHERE r.club =  ? AND r.status = ? " + orderBy, club, status);
+        q.setFirstResult(first);
+        q.setMaxResults(limit);
+        return q.getResultList();
+    }
+
+    public static List<ClubReading> getClubReadingByBook(Club club, Book book, ReadingStatus status) {
+        Query q = createQuery("SELECT r FROM ClubReading r WHERE r.club = ? AND r.book = ? AND r.status = ?", club, book, status);
+        return q.getResultList();
+    }
+
+    public static List<ClubReading> getClubWishlisted(Club club, int first, int limit) {
+        return getClubReadingByStatus(club, ReadingStatus.WISHLISTED, first, limit, "order by r.wishlisted asc");
+    }
+
+    public static List<ClubReading> getClubReading(Club club, int first, int limit) {
+        return getClubReadingByStatus(club, ReadingStatus.READING, first, limit, "order by r.reading asc");
+    }
+
+    public static List<ClubReading> getClubFinished(Club club, int first, int limit) {
+        return getClubReadingByStatus(club, ReadingStatus.FINISHED, first, limit, "order by r.finished asc");
+    }
+
+    /* Book similarities */
+    public static BookSimilarity getBookSimilarityForBook(Book original, Book similar) {
+        Query q = createQuery("SELECT s FROM BookSimilarity s WHERE s.original = ? AND s.similar = ?", original, similar);
+        List<Object> r = q.getResultList();
+        if(r.isEmpty()) return null;
+        return (BookSimilarity)r.get(0);
+    }
+
+    public static List<BookSimilarity> getSimilarBooks(Book book) {
+        Query q = createQuery("SELECT s FROM BookSimilarity s WHERE s.original = ? ", book);
+        return q.getResultList();
+    }
+
+    public static BookSimilarityVote getBookSimilarityVoteForUser(BookSimilarity similarity, User user) {
+        return getUnique(BookSimilarityVote.class, " WHERE obj.id.similarity = ? AND obj.id.user = ?", similarity, user);
     }
     
 }

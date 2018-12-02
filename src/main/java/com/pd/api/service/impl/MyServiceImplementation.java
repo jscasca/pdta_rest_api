@@ -11,15 +11,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import com.pd.api.entity.*;
 import org.joda.time.Hours;
 
 import com.pd.api.db.DAO;
-import com.pd.api.entity.Book;
-import com.pd.api.entity.Credential;
-import com.pd.api.entity.Posdta;
-import com.pd.api.entity.Role;
-import com.pd.api.entity.User;
-import com.pd.api.entity.UserRecommendations;
 import com.pd.api.entity.aux.LibraryView;
 import com.pd.api.entity.aux.LoggedInWrapper;
 import com.pd.api.exception.GeneralException;
@@ -31,6 +26,8 @@ public class MyServiceImplementation {
     public static final Long thresholdSinceLastCalculated = (long) (7 * 24 * 60 * 60 * 1000);
     public static final Long thresholdSinceLastPosdta = (long) (24 * 60 * 60 * 1000);
     public static final int DEFAULT_RECOMMENDATIONS = 20;
+
+    public static final int DEFAULT_BOOK_INTERACTIONS = 2000;
     
     private static final ExecutorService executor = Executors.newFixedThreadPool(3);
 
@@ -45,11 +42,54 @@ public class MyServiceImplementation {
         return new LoggedInWrapper(credential);
     }
     
-    //TODO: allow the limit to be passed as a parameter
+    // TODO: allow the limit to be passed as a parameter
     public static LibraryView getUserLibraryView(String username) {
         User user = DAO.getUserByUsername(username);
         LibraryView lv = DAO.getUserLibraryView(user);
         return lv;
+    }
+
+    public static List<Club> getMyClubs(String username, int start, int limit) {
+        User user = DAO.getUserByUsername(username);
+        return DAO.getUserClubs(user, start, limit);
+    }
+
+    // TODO: optimize; Maybe should only be read + wishlisted?
+    public static List<Book> getMyBooks(String username, String filter, int start, int limit) {
+        User user = DAO.getUserByUsername(username);
+        List<Posdta> read = DAO.getUserPosdtas(user.getId(), start, limit);
+        List<UserBookInteraction> unread = DAO.getUserBookInteractions(user, start, DEFAULT_BOOK_INTERACTIONS);
+        List<Book> myBooks = new ArrayList<>();
+        //
+        for(Posdta posdta: read) {
+            Book book = posdta.getBook();
+            if(simpleStringFilter(book, filter)) {
+                myBooks.add(book);
+            }
+        }
+        for(UserBookInteraction interaction: unread) {
+            Book book = interaction.getBook();
+            if(simpleStringFilter(book, filter)) {
+                myBooks.add(book);
+            }
+        }
+        return myBooks;
+    }
+
+    public static List<Book> getMyReadBooks(String username, String filter, int start, int limit) {
+        User user = DAO.getUserByUsername(username);
+        List<Book> books = DAO.getUserRead(user, 0, 500);
+        return books;
+    }
+
+    // TODO: implement this naive filter
+    public static boolean simpleStringFilter(Book book, String filter) {
+        return true;
+    }
+
+    // TODO: implement this complex filter
+    public static double complexStringFilter(Book book, String filter) {
+        return 0;
     }
     
     public static List<Book> getWishlisted(String username, int start, int limit) {
