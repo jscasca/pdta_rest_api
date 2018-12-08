@@ -42,10 +42,58 @@ public class CommentService {
         return CommentServiceImplementation.getBookThreads(bookId, start, limit);
     }
 
-    @RequestMapping(value="/books/{id:[0-9]+}/commenttree")
+    @Secured("ROLE_USER")
+    @RequestMapping(value="/clubs/{id:[0-9]+}/threads", method = RequestMethod.POST)
+    @ResponseBody
+    public Comment starClubThread(@ModelAttribute final CustomUserData userData,
+                                  @PathVariable("id") final Long clubId,
+                                  @RequestBody final String comment) {
+        return CommentServiceImplementation.startClubThread(userData.getUsername(), clubId, comment);
+    }
+
+    //TODO: implement to return a tree of comments
+    @RequestMapping(value="/clubs/{id:[0-9]+}/threads", method = RequestMethod.GET)
+    @ResponseBody
+    public List<CommentThread> getClubThreads(@PathVariable("id") final Long clubId,
+                                              @RequestParam(value="start", defaultValue="0") final int start,
+                                              @RequestParam(value="limit", defaultValue="100") final int limit){
+        return CommentServiceImplementation.getClubThreads(clubId, start, limit);
+    }
+
+    @Secured("ROLE_USER")
+    @RequestMapping(value="/clubs/{name:[a-zA-Z][a-zA-Z0-9_]+}/threads", method = RequestMethod.POST)
+    @ResponseBody
+    public Comment starClubThread(@ModelAttribute final CustomUserData userData,
+                                  @PathVariable("name") final String clubName,
+                                  @RequestBody final String comment) {
+        return CommentServiceImplementation.startClubThread(userData.getUsername(), clubName, comment);
+    }
+
+    //TODO: implement to return a tree of comments
+    @RequestMapping(value="/clubs/{name:[a-zA-Z][a-zA-Z0-9_]+}/threads", method = RequestMethod.GET)
+    @ResponseBody
+    public List<CommentThread> getClubThreads(@PathVariable("name") final String clubName,
+                                              @RequestParam(value="start", defaultValue="0") final int start,
+                                              @RequestParam(value="limit", defaultValue="100") final int limit){
+        return CommentServiceImplementation.getClubThreads(clubName, start, limit);
+    }
+
+    @RequestMapping(value="/books/{id:[0-9]+}/comments")
     @ResponseBody
     public CommentTree getBookCommentTree(@PathVariable("id") final Long bookId) {
         return CommentServiceImplementation.getBookCommentTree(bookId);
+    }
+
+    @RequestMapping(value="/clubs/{id:[0-9]+}/comments")
+    @ResponseBody
+    public CommentTree getClubCommentTree(@PathVariable("id") final Long clubId) {
+        return CommentServiceImplementation.getClubCommentTree(clubId);
+    }
+
+    @RequestMapping(value="/clubs/{name:[a-zA-Z][a-zA-Z0-9_]+}/comments")
+    @ResponseBody
+    public CommentTree getClubCommentTree(@PathVariable("name") final String clubName) {
+        return CommentServiceImplementation.getClubCommentTree(clubName);
     }
 
     @Secured("ROLE_USER")
