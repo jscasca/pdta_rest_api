@@ -1,10 +1,15 @@
 package com.pd.api.db;
 
+import com.mysql.jdbc.Connection;
+import org.hibernate.Hibernate;
+import org.hibernate.ejb.HibernatePersistence;
+
 import java.util.HashMap;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceProperty;
 
 public class ThreadEntityManagerFactory {
 
@@ -61,6 +66,7 @@ public class ThreadEntityManagerFactory {
                     HashMap<String, String> map = new HashMap<String, String>();
                     String hibernateConnection = dburl;
                     map.put("hibernate.connection.url", hibernateConnection);
+                    map.put("hibernate.connection.isolation", String.valueOf(Connection.TRANSACTION_READ_UNCOMMITTED));
                     EntityManagerFactory emf = Persistence.createEntityManagerFactory(persistenceContext, map);
                     emfMap.put(dburl, emf);
                 }
