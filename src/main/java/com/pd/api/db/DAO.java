@@ -563,6 +563,17 @@ e2.setSomeField(anotherValue);
         BookInfo info = new BookInfo(book);
         return info;
     }
+
+    public static String getBookDetail(Long bookId) {
+        BookDetail detail = get(BookDetail.class, bookId);
+        return detail != null ? detail.getDetails() : "{}"; // return an empty detail
+    }
+
+    public static BookDetail setBookDetail(Long bookId, String details) {
+        Book book = getBookById(bookId);
+        BookDetail detail = new BookDetail(book, details);
+        return put(detail);
+    }
     
     public static BookIndex getLastBookIndex() {
         return getUnique(BookIndex.class, "ORDER BY id DESC limit 1");

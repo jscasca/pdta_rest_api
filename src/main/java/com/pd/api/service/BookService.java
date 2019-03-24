@@ -1,5 +1,6 @@
 package com.pd.api.service;
 
+import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -49,6 +50,19 @@ public class BookService {
     public Book findById(@PathVariable("id") final Long id,
             final UriComponentsBuilder uriBuilder, final HttpServletResponse response) {
         return BookServiceImplementation.getBookById(id);
+    }
+
+    @RequestMapping(value="/{id:[0-9]+}/details")
+    @ResponseBody
+    public String getBookDetails(@PathVariable("id") final Long bookId) {
+        return BookServiceImplementation.getBookDetail(bookId);
+    }
+
+    @Secured("ROLE_USER")
+    @RequestMapping(value="/{id:[0-9]+}/details", method = RequestMethod.PUT)
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void setBookDetails(@PathVariable("id") final Long bookId, final String details) {
+        BookServiceImplementation.setBookDetail(bookId, details);
     }
     
     //BOOKS AND FAVORITES

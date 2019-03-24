@@ -13,14 +13,17 @@ public class BookRequestWrapper {
     public String icon;
     
     public String thumbnail;
+
+    public String details;
     
     public BookRequestWrapper() {}
-    public BookRequestWrapper(String title, String authors, String language, String icon, String thumbnail) {
+    public BookRequestWrapper(String title, String authors, String language, String icon, String thumbnail, String details) {
         this.title = title;
         this.authors = authors;
         this.language = language;
         this.icon = icon;
         this.thumbnail = thumbnail;
+        this.details = details;
     }
     
     public String getTitle() {
@@ -36,5 +39,9 @@ public class BookRequestWrapper {
     
     public String getLanguageString() {
         return language;
+    }
+
+    public String getDetails() {
+        return details;
     }
 }

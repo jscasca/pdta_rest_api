@@ -28,7 +28,9 @@ public class DataBaseBuilder {
         ac.addAnnotatedClass(BookRecordRequest.class);
         ac.addAnnotatedClass(BookWishlisted.class);
         ac.addAnnotatedClass(BookSuggestions.class);
-        /*Book siimlarities*/
+        /*Book Details*/
+        ac.addAnnotatedClass(BookDetail.class);
+        /*Book similarities*/
         ac.addAnnotatedClass(BookSimilarity.class);
         ac.addAnnotatedClass(BookSimilarityVote.class);
         ac.addAnnotatedClass(Comment.class);
