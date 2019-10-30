@@ -8,7 +8,7 @@ import javax.persistence.*;
 @Entity
 @Table(name="thread_book")
 @PrimaryKeyJoinColumn(name="id")
-public class ThreadForBook extends CommentThread {
+public class BookThread extends CommentThread {
 
     @ManyToOne
     @JoinColumn(name="book_id")
@@ -17,12 +17,10 @@ public class ThreadForBook extends CommentThread {
     @Transient
     private String className = "Book Thread";
 
-    public ThreadForBook(){
-        super();
-    }
+    public BookThread() {}
 
-    public ThreadForBook(Comment comment, Book book) {
-        super(comment);
+    public BookThread(Book book) {
+        super(ThreadType.BOOK);
         this.book = book;
     }
 

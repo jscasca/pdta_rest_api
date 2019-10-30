@@ -67,7 +67,7 @@ public class DAO {
         }
         return true;
     }
-    
+
     public static <T> T put(T obj) {
         return put(obj, false);
     }
@@ -79,6 +79,7 @@ public class DAO {
             Object o = em.merge(obj);
             em.flush();
             tx.commit();
+            em.refresh(o);
             return(T) o;
         } else {
             tx.begin();
@@ -86,9 +87,13 @@ public class DAO {
             em.flush();
             em.refresh(o);
             tx.commit();
+            em.refresh(o);
             return (T) o;
         }
     }
+
+    // Hibernate will not re-calculate the @Formula field after it is updated.
+    // https://stackoverflow.com/questions/48641052/hibernate-formula-returns-an-old-value-in-put-response
 
     /*public static <T> T putAndRefresh(T obj) {
         EntityManager em = getEM();
@@ -162,6 +167,10 @@ e2.setSomeField(anotherValue);
     
     public static void refresh(Object obj) {
         getEM().refresh(obj);
+    }
+
+    public static void clear() {
+        getEM().clear();
     }
     
     public static <T> T remove(Class<T> type, Long id) {
@@ -696,12 +705,12 @@ e2.setSomeField(anotherValue);
     }
 
     public static List<CommentThread> getClubThreads(Club club, int first, int limit) {
-        Query q = createQuery("SELECT t FROM ThreadForClub t where club = ? order by id desc", club);
+        Query q = createQuery("SELECT t FROM ClubThread t where club = ? order by id desc", club);
         return q.getResultList();
     }
 
     public static List<CommentThread> getBookThreads(Book book, int first, int limit) {
-        Query q = createQuery("SELECT t FROM ThreadForBook t where book = ? order by id desc", book);
+        Query q = createQuery("SELECT t FROM BookThread t where book = ? order by id desc", book);
         return q.getResultList();
     }
 
@@ -723,7 +732,7 @@ e2.setSomeField(anotherValue);
     public static CommentTree getCommentTree(List<CommentThread> threads) {
         List<CommentNode> nodes = new ArrayList<>();
         for(int i = 0; i < threads.size(); i++) {
-            Comment comment = threads.get(i).getComment();
+            Comment comment = getFirstComment(threads.get(i));
             CommentNode node = getCommentNodes(comment);
             nodes.add(node);
         }
@@ -739,8 +748,13 @@ e2.setSomeField(anotherValue);
         return CommentNode.createCommentNode(comment, replyTree);
     }
 
+    public static Comment getFirstComment(CommentThread thread) {
+        Query q = createQuery("SELECT c FROM Comment c WHERE c.parent is null AND c.thread = ? ", thread);
+        return (Comment)q.getResultList().get(0);
+    }
+
     public static List<User> getClubMembers(Club club, int first, int limit) {
-        Query q = createQuery("Select m.id.user FROM ClubMembership m WHERE m.id.club =  ?", club);
+        Query q = createQuery("Select m.id.user FROM ClubMembership m WHERE m.id.club =  ? AND ( m.status = ? OR m.status IS NULL)", club, ClubMembership.MembershipStatus.MEMBER);
         q.setFirstResult(first);
         q.setMaxResults(limit);
         return q.getResultList();

@@ -43,12 +43,18 @@ public class DataBaseBuilder {
         ac.addAnnotatedClass(Club.class);
         ac.addAnnotatedClass(ClubMembership.class);
         ac.addAnnotatedClass(ClubReading.class);
+        /**
+         * Comments
+         */
+        ac.addAnnotatedClass(Comment.class);
+        ac.addAnnotatedClass(CommentThread.class);
+        ac.addAnnotatedClass(ClubThread.class);
+        ac.addAnnotatedClass(BookThread.class);
+        //
         ac.addAnnotatedClass(Language.class);
         ac.addAnnotatedClass(Posdta.class);
         ac.addAnnotatedClass(PosdtaVoting.class);
         ac.addAnnotatedClass(Role.class);
-        ac.addAnnotatedClass(ThreadForBook.class);
-        ac.addAnnotatedClass(ThreadForClub.class);
         ac.addAnnotatedClass(User.class);
         ac.addAnnotatedClass(UserBookInteraction.class);
         ac.addAnnotatedClass(UserVote.class);

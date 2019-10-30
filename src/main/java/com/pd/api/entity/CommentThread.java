@@ -10,21 +10,31 @@ import javax.persistence.*;
 @Inheritance(strategy=InheritanceType.JOINED)
 public class CommentThread {
 
+    public enum ThreadType {
+        BOOK,
+        CLUB
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id = null;
 
-    @OneToOne
-    @JoinColumn(name="comment_id")
-    private Comment comment;
+    private ThreadType type;
+//
+//    @OneToOne
+//    @JoinColumn(name="comment_id")
+//    private Comment comment;
 
-    protected CommentThread(){}
-
-    protected CommentThread(Comment comment) {
-        this.comment = comment;
+    protected CommentThread() {}
+    protected CommentThread(ThreadType type){
+        this.type = type;
     }
 
-    public Comment getComment(){
-        return comment;
+    public Long getId() {
+        return id;
+    }
+
+    public ThreadType getType() {
+        return type;
     }
 }

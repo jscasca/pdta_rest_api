@@ -27,24 +27,30 @@ public class Comment {
 
     private String text;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="parent_id")
     private Comment parent;
+
+    @ManyToOne
+    @JoinColumn(name="thread_id")
+    private CommentThread thread;
 
     @Formula("(SELECT COUNT(*) FROM comment c WHERE c.parent_id = id)")
     protected int replies;
 
     protected Comment(){}
 
-    public Comment(User user, String text) {
+    public Comment(User user, String text, CommentThread thread) {
         this.text = text;
         this.user = user;
+        this.thread = thread;
     }
 
     public Comment(User user, String text, Comment parent) {
         this.text = text;
         this.parent = parent;
         this.user = user;
+        this.thread = parent.thread;
     }
 
 
@@ -58,6 +64,10 @@ public class Comment {
 
     public Comment getParent(){
         return parent;
+    }
+
+    public CommentThread getThread() {
+        return thread;
     }
 
     public User getUser(){

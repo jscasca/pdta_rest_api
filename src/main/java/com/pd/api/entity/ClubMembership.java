@@ -21,6 +21,12 @@ public class ClubMembership implements Serializable {
         CAN_INVITE
     }
 
+    public enum MembershipStatus {
+        BANNED,
+        MEMBER,
+        INACTIVE
+    }
+
     @Id
     private ClubMembershipKeys id;
 
@@ -39,6 +45,9 @@ public class ClubMembership implements Serializable {
 
     private String permissions;
 
+    @Enumerated(EnumType.STRING)
+    protected MembershipStatus status;
+
     @Transient
     private HashSet<ClubPermission> permissionSet;
 
@@ -48,6 +57,7 @@ public class ClubMembership implements Serializable {
         this.id = new ClubMembershipKeys(u, g);
         this.permissionSet = permissionSet;
         this.permissions = mapPermissionsToString(permissionSet);
+        this.status = MembershipStatus.MEMBER;
     }
 
     public ClubMembershipKeys getId() {
@@ -80,6 +90,14 @@ public class ClubMembership implements Serializable {
 
     public boolean canInvite() {
         return checkPermission(ClubPermission.ADMIN);
+    }
+
+    public MembershipStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(MembershipStatus status) {
+        this.status = status;
     }
 
     @PostLoad

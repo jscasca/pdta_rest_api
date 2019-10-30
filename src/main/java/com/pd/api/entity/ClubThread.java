@@ -8,7 +8,7 @@ import javax.persistence.*;
 @Entity
 @Table(name="thread_club")
 @PrimaryKeyJoinColumn(name="id")
-public class ThreadForClub extends CommentThread {
+public class ClubThread extends CommentThread {
     @ManyToOne
     @JoinColumn(name="club_id")
     private Club club;
@@ -16,12 +16,10 @@ public class ThreadForClub extends CommentThread {
     @Transient
     private String className = "Group Thread";
 
-    public ThreadForClub(){
-        super();
-    }
+    public ClubThread(){}
 
-    public ThreadForClub(Comment comment, Club club) {
-        super(comment);
+    public ClubThread(Club club) {
+        super(ThreadType.CLUB);
         this.club = club;
     }
 
